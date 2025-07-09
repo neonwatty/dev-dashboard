@@ -28,4 +28,17 @@ module ApplicationHelper
       'gray'
     end
   end
+
+  def source_display_color(source_name)
+    case source_name
+    when 'huggingface'
+      'yellow'
+    when 'pytorch'
+      'orange'
+    when 'github'
+      'gray'
+    else
+      'blue'
+    end
+  end
 end

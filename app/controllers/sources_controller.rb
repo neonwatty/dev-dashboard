@@ -50,7 +50,7 @@ class SourcesController < ApplicationController
         FetchPytorchJob.perform_later(@source.id)
       end
     when 'github'
-      # FetchGitHubIssuesJob.perform_later(@source.id)
+      FetchGithubIssuesJob.perform_later(@source.id)
     when 'rss'
       # FetchRSSJob.perform_later(@source.id)
     when 'reddit'
