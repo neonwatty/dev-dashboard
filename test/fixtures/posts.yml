@@ -1,27 +1,66 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  source: MyString
-  external_id: MyString
-  title: MyString
-  url: MyString
-  author: MyString
-  posted_at: 2025-07-09 10:51:19
-  summary: MyText
-  tags: MyText
-  status: MyString
-  priority_score: 1.5
-  llm_reply_draft: MyText
+huggingface_post:
+  source: huggingface
+  external_id: "12345"
+  title: "How to fine-tune transformers"
+  url: https://discuss.huggingface.co/t/how-to-fine-tune-transformers/12345
+  author: ml_researcher
+  posted_at: <%= 2.hours.ago %>
+  summary: "A comprehensive guide on fine-tuning transformer models"
+  tags: '["transformers", "fine-tuning", "tutorial"]'
+  status: unread
+  priority_score: 8.5
+  llm_reply_draft: 
 
-two:
-  source: MyString
-  external_id: MyString
-  title: MyString
-  url: MyString
-  author: MyString
-  posted_at: 2025-07-09 10:51:19
-  summary: MyText
-  tags: MyText
-  status: MyString
-  priority_score: 1.5
-  llm_reply_draft: MyText
+github_issue:
+  source: github
+  external_id: "55112"
+  title: "Classes are reloaded during request specs since 7.2"
+  url: https://github.com/rails/rails/issues/55112
+  author: developer123
+  posted_at: <%= 1.day.ago %>
+  summary: "Issue with class reloading in Rails 7.2 during tests"
+  tags: '["bug", "railties", "testing"]'
+  status: unread
+  priority_score: 6.2
+  llm_reply_draft: 
+
+rss_post:
+  source: rss
+  external_id: "ruby-news-456"
+  title: "Ruby 3.4 New Features"
+  url: https://example.com/ruby-34-features
+  author: ruby_team
+  posted_at: <%= 3.days.ago %>
+  summary: "Overview of new features in Ruby 3.4 release"
+  tags: '["ruby", "release", "features"]'
+  status: read
+  priority_score: 9.1
+  llm_reply_draft: 
+
+hackernews_post:
+  source: hackernews
+  external_id: "123456"
+  title: "Show HN: My new developer tool"
+  url: https://news.ycombinator.com/item?id=123456
+  author: startup_founder
+  posted_at: <%= 4.hours.ago %>
+  summary: "Introducing a new tool for developers to improve productivity"
+  tags: '["show", "developer", "tool"]'
+  status: unread
+  priority_score: 7.8
+  llm_reply_draft: 
+
+responded_post:
+  source: github
+  external_id: "55200"
+  title: "Feature request: Add new API endpoint"
+  url: https://github.com/rails/rails/issues/55200
+  author: api_user
+  posted_at: <%= 1.week.ago %>
+  summary: "Request for a new API endpoint to improve developer experience"
+  tags: '["enhancement", "api"]'
+  status: responded
+  priority_score: 5.5
+  llm_reply_draft: "Thanks for the suggestion!"

@@ -6,7 +6,7 @@ class PostsController < ApplicationController
     
     # Apply filters
     @posts = @posts.where(source: params[:source]) if params[:source].present?
-    @posts = @posts.where("title ILIKE ?", "%#{params[:keyword]}%") if params[:keyword].present?
+    @posts = @posts.where("title LIKE ?", "%#{params[:keyword]}%") if params[:keyword].present?
     @posts = @posts.where(status: params[:status]) if params[:status].present?
     
     # Handle tag filtering

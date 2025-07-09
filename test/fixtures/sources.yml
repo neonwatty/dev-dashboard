@@ -1,19 +1,55 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
-  source_type: MyString
-  url: MyString
-  config: MyText
-  active: false
-  last_fetched_at: 2025-07-09 10:53:29
-  status: MyString
+huggingface_forum:
+  name: HuggingFace Forum
+  source_type: discourse
+  url: https://discuss.huggingface.co
+  config: '{}'
+  active: true
+  last_fetched_at: <%= 1.hour.ago %>
+  status: ok
 
-two:
-  name: MyString
-  source_type: MyString
-  url: MyString
-  config: MyText
+pytorch_forum:
+  name: PyTorch Forum
+  source_type: discourse
+  url: https://discuss.pytorch.org
+  config: '{}'
+  active: true
+  last_fetched_at: <%= 45.minutes.ago %>
+  status: ok
+
+rails_github:
+  name: Rails GitHub Issues
+  source_type: github
+  url: https://github.com/rails/rails
+  config: '{"labels": ["bug", "enhancement"]}'
+  active: true
+  last_fetched_at: <%= 30.minutes.ago %>
+  status: ok
+
+ruby_blog_rss:
+  name: Ruby Weekly RSS
+  source_type: rss
+  url: https://rubyweekly.com/rss
+  config: '{"keywords": ["ruby", "rails"], "max_items": 20}'
+  active: true
+  last_fetched_at: <%= 2.hours.ago %>
+  status: ok
+
+hacker_news:
+  name: Hacker News
+  source_type: rss
+  url: https://news.ycombinator.com
+  config: '{"story_types": ["top", "new"], "min_score": 10}'
+  active: true
+  last_fetched_at: <%= 15.minutes.ago %>
+  status: ok
+
+inactive_source:
+  name: Inactive Source
+  source_type: discourse
+  url: https://example.com
+  config: '{}'
   active: false
-  last_fetched_at: 2025-07-09 10:53:29
-  status: MyString
+  last_fetched_at: <%= 1.week.ago %>
+  status: error

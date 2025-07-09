@@ -112,12 +112,12 @@ class FetchGithubIssuesJob < ApplicationJob
     score = 0
     
     # Base score from engagement
-    score += issue['comments'] * 0.5
+    score += (issue['comments'] || 0) * 0.5
     score += count_reactions(issue['reactions']) * 0.3
     
     # Boost for helpful labels
     helpful_labels = ['good first issue', 'help wanted', 'beginner friendly', 'easy', 'starter']
-    labels = issue['labels'].map { |label| label['name'].downcase }
+    labels = (issue['labels'] || []).map { |label| label['name'].downcase }
     score += 5.0 if (labels & helpful_labels).any?
     
     # Boost for bug reports
@@ -131,7 +131,7 @@ class FetchGithubIssuesJob < ApplicationJob
     score += [10 - hours_old, 0].max * 0.3
     
     # Boost issues with recent activity
-    if issue['updated_at'] != issue['created_at']
+    if issue['updated_at'] && issue['updated_at'] != issue['created_at']
       hours_since_update = (Time.current - Time.parse(issue['updated_at'])) / 1.hour
       score += [5 - hours_since_update, 0].max * 0.2
     end

@@ -37,6 +37,10 @@ module ApplicationHelper
       'orange'
     when 'github'
       'gray'
+    when 'rss'
+      'green'
+    when 'hackernews'
+      'orange'
     else
       'blue'
     end

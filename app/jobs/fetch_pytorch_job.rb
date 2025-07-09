@@ -53,7 +53,8 @@ class FetchPytorchJob < ApplicationJob
       external_id: topic['id'].to_s
     ) do |post|
       post.title = topic['title']
-      post.url = "#{source.url}/t/#{topic['slug']}/#{topic['id']}"
+      slug = topic['slug'] || "topic-#{topic['id']}"
+      post.url = "#{source.url}/t/#{slug}/#{topic['id']}"
       post.author = topic['last_poster_username'] || 'unknown'
       post.posted_at = Time.parse(topic['created_at'])
       post.summary = topic['excerpt']
@@ -65,16 +66,16 @@ class FetchPytorchJob < ApplicationJob
 
   def calculate_priority_score(topic)
     score = 0
-    score += topic['reply_count'] * 0.1
-    score += topic['like_count'] * 0.2 if topic['like_count']
-    score += topic['views'] * 0.001 if topic['views']
+    score += (topic['reply_count'] || 0) * 0.1
+    score += (topic['like_count'] || 0) * 0.2
+    score += (topic['views'] || 0) * 0.001
     
     # Boost recent posts
     hours_old = (Time.current - Time.parse(topic['created_at'])) / 1.hour
     score += [10 - hours_old, 0].max * 0.5
     
     # Boost unanswered questions
-    score += 2.0 if topic['reply_count'] == 0
+    score += 2.0 if (topic['reply_count'] || 0) == 0
     
     score
   end

@@ -61,6 +61,9 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Testing utilities
+  gem "shoulda-matchers"
 end
 
 group :development do
@@ -72,4 +75,11 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+  
+  # HTTP request mocking
+  gem "webmock"
+  gem "vcr"
+  
+  # Time manipulation for testing
+  gem "timecop"
 end

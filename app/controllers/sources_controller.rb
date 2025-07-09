@@ -21,7 +21,7 @@ class SourcesController < ApplicationController
     if @source.save
       redirect_to @source, notice: 'Source was successfully created.'
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -52,7 +52,11 @@ class SourcesController < ApplicationController
     when 'github'
       FetchGithubIssuesJob.perform_later(@source.id)
     when 'rss'
-      # FetchRSSJob.perform_later(@source.id)
+      if @source.url.include?('news.ycombinator.com') || @source.name.downcase.include?('hacker news')
+        FetchHackerNewsJob.perform_later(@source.id)
+      else
+        FetchRssJob.perform_later(@source.id)
+      end
     when 'reddit'
       # FetchRedditJob.perform_later(@source.id)
     end
