@@ -6,6 +6,39 @@ class SourcesController < ApplicationController
   def index
     @sources = Source.all.order(:name)
   end
+  
+  def refresh_all
+    active_sources = Source.active
+    job_count = 0
+    
+    active_sources.each do |source|
+      source.update!(status: 'refreshing...')
+      
+      case source.source_type
+      when 'discourse'
+        if source.url.include?('huggingface.co')
+          FetchHuggingFaceJob.perform_later(source.id)
+          job_count += 1
+        elsif source.url.include?('pytorch.org')
+          FetchPytorchJob.perform_later(source.id)
+          job_count += 1
+        end
+      when 'github'
+        FetchGithubIssuesJob.perform_later(source.id)
+        job_count += 1
+      when 'rss'
+        if source.url.include?('news.ycombinator.com') || source.name.downcase.include?('hacker news')
+          FetchHackerNewsJob.perform_later(source.id)
+          job_count += 1
+        else
+          FetchRssJob.perform_later(source.id)
+          job_count += 1
+        end
+      end
+    end
+    
+    redirect_to sources_path, notice: "Queued #{job_count} refresh jobs for active sources."
+  end
 
   def show
   end
@@ -42,26 +75,45 @@ class SourcesController < ApplicationController
   end
   
   def refresh
-    case @source.source_type
+    # Update status to indicate refresh is in progress
+    @source.update!(status: 'refreshing...')
+    
+    # Queue the appropriate job
+    job_queued = case @source.source_type
     when 'discourse'
       if @source.url.include?('huggingface.co')
         FetchHuggingFaceJob.perform_later(@source.id)
+        'HuggingFace'
       elsif @source.url.include?('pytorch.org')
         FetchPytorchJob.perform_later(@source.id)
+        'PyTorch'
+      else
+        false
       end
     when 'github'
       FetchGithubIssuesJob.perform_later(@source.id)
+      'GitHub'
     when 'rss'
       if @source.url.include?('news.ycombinator.com') || @source.name.downcase.include?('hacker news')
         FetchHackerNewsJob.perform_later(@source.id)
+        'Hacker News'
       else
         FetchRssJob.perform_later(@source.id)
+        'RSS'
       end
     when 'reddit'
       # FetchRedditJob.perform_later(@source.id)
+      false
+    else
+      false
     end
     
-    redirect_to @source, notice: 'Refresh started for this source.'
+    if job_queued
+      redirect_back(fallback_location: sources_path, notice: "#{job_queued} refresh job queued for #{@source.name}. Check back in a moment.")
+    else
+      @source.update!(status: 'error: unsupported source type')
+      redirect_back(fallback_location: sources_path, alert: "Refresh not supported for this source type yet.")
+    end
   end
   
   def test_connection
