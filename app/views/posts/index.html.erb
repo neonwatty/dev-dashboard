@@ -1,11 +1,84 @@
-<div class="container mx-auto px-4 py-8">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">Developer Dashboard</h1>
-    <div class="flex space-x-4">
-      <%= link_to "Sources", sources_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
-      <button onclick="refreshAll()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-        Refresh All
-      </button>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <!-- Header Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-6 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+      <div class="mb-4 md:mb-0">
+        <h1 class="text-3xl font-bold text-white">Developer Dashboard</h1>
+        <p class="text-blue-100 mt-2">Discover opportunities to contribute to the developer community</p>
+      </div>
+      <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+        <%= link_to new_source_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+          <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add Source
+        <% end %>
+        <button onclick="refreshAll()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+          <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Refresh All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Total Posts</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= Post.count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Unread</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= Post.where(status: 'unread').count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Responded</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= Post.where(status: 'responded').count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Active Sources</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= Source.active.count %></p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -39,8 +112,8 @@
       </div>
       
       <div class="flex space-x-4">
-        <%= form.submit "Filter", class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
-        <%= link_to "Clear", posts_path, class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
+        <%= form.submit "Filter", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
+        <%= link_to "Clear", posts_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
       </div>
     <% end %>
   </div>
@@ -90,11 +163,11 @@
             
             <div class="flex flex-col space-y-1">
               <%= link_to "Read", mark_as_read_post_path(post), method: :patch, 
-                         class: "text-xs bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-2 rounded" %>
+                         class: "text-xs bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded transition-colors" %>
               <%= link_to "Ignore", mark_as_ignored_post_path(post), method: :patch, 
-                         class: "text-xs bg-gray-500 hover:bg-gray-700 text-white font-bold py-1 px-2 rounded" %>
+                         class: "text-xs bg-gray-500 hover:bg-gray-600 text-white font-medium py-1 px-2 rounded transition-colors" %>
               <%= link_to "Responded", mark_as_responded_post_path(post), method: :patch, 
-                         class: "text-xs bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded" %>
+                         class: "text-xs bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-2 rounded transition-colors" %>
             </div>
           </div>
         </div>
@@ -104,7 +177,9 @@
 
   <!-- Pagination -->
   <div class="mt-8 flex justify-center">
-    <%= paginate @posts %>
+    <div class="bg-white rounded-lg shadow-sm">
+      <%= paginate @posts %>
+    </div>
   </div>
 </div>
 
