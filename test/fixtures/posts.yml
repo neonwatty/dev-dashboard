@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  source: MyString
+  external_id: MyString
+  title: MyString
+  url: MyString
+  author: MyString
+  posted_at: 2025-07-09 10:51:19
+  summary: MyText
+  tags: MyText
+  status: MyString
+  priority_score: 1.5
+  llm_reply_draft: MyText
+
+two:
+  source: MyString
+  external_id: MyString
+  title: MyString
+  url: MyString
+  author: MyString
+  posted_at: 2025-07-09 10:51:19
+  summary: MyText
+  tags: MyText
+  status: MyString
+  priority_score: 1.5
+  llm_reply_draft: MyText
