@@ -45,6 +45,24 @@ hacker_news:
   last_fetched_at: <%= 15.minutes.ago %>
   status: ok
 
+machine_learning_reddit:
+  name: Machine Learning Reddit
+  source_type: reddit
+  url: https://www.reddit.com/r/MachineLearning
+  config: '{"sort": "hot", "limit": 25, "keywords": ["paper", "research", "AI"]}'
+  active: true
+  last_fetched_at: <%= 1.hour.ago %>
+  status: ok
+
+programming_reddit:
+  name: Programming Reddit
+  source_type: reddit
+  url: https://www.reddit.com/r/programming
+  config: '{"sort": "hot", "limit": 20}'
+  active: true
+  last_fetched_at: <%= 2.hours.ago %>
+  status: ok
+
 inactive_source:
   name: Inactive Source
   source_type: discourse

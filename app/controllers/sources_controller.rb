@@ -34,6 +34,9 @@ class SourcesController < ApplicationController
           FetchRssJob.perform_later(source.id)
           job_count += 1
         end
+      when 'reddit'
+        FetchRedditJob.perform_later(source.id)
+        job_count += 1
       end
     end
     
@@ -102,8 +105,8 @@ class SourcesController < ApplicationController
         'RSS'
       end
     when 'reddit'
-      # FetchRedditJob.perform_later(@source.id)
-      false
+      FetchRedditJob.perform_later(@source.id)
+      'Reddit'
     else
       false
     end

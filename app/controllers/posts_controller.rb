@@ -15,6 +15,11 @@ class PostsController < ApplicationController
       @posts = @posts.where("tags::text ILIKE ?", "%#{params[:tag]}%")
     end
     
+    # Handle subreddit filtering
+    if params[:subreddit].present?
+      @posts = @posts.where("tags::text ILIKE ?", "%subreddit:#{params[:subreddit]}%")
+    end
+    
     # Apply sorting
     case params[:sort]
     when 'priority'
@@ -30,6 +35,7 @@ class PostsController < ApplicationController
     # For filter options
     @sources = Post.distinct.pluck(:source).compact
     @all_tags = extract_all_tags
+    @subreddits = extract_all_subreddits
   end
 
   def show
@@ -62,5 +68,17 @@ class PostsController < ApplicationController
       tags.concat(post.tags_array)
     end
     tags.uniq.sort
+  end
+  
+  def extract_all_subreddits
+    subreddits = []
+    Post.where.not(tags: [nil, '']).find_each do |post|
+      post.tags_array.each do |tag|
+        if tag.start_with?('subreddit:')
+          subreddits << tag.sub('subreddit:', '')
+        end
+      end
+    end
+    subreddits.uniq.sort
   end
 end

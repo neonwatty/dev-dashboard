@@ -102,4 +102,16 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
     @source.reload
     assert_equal 'ok', @source.status
   end
+  
+  test "should refresh Reddit source" do
+    reddit_source = sources(:machine_learning_reddit)
+    
+    # Mock the job
+    assert_enqueued_with(job: FetchRedditJob, args: [reddit_source.id]) do
+      post refresh_source_url(reddit_source)
+    end
+
+    assert_redirected_to sources_url
+    assert_match(/Reddit refresh job queued/, flash[:notice])
+  end
 end
