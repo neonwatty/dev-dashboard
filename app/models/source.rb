@@ -3,7 +3,9 @@ class Source < ApplicationRecord
   
   validates :name, presence: true
   validates :source_type, presence: true
-  validates :url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
+  validates :url, presence: true, 
+            format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) },
+            uniqueness: { case_sensitive: false, message: "has already been added" }
   validates :active, inclusion: { in: [true, false] }
   
   scope :active, -> { where(active: true) }

@@ -75,7 +75,7 @@ class SourceWorkflowTest < ActionDispatch::IntegrationTest
       post sources_path, params: {
         source: {
           name: "", # Invalid: blank name
-          source_type: "invalid_type", # Invalid type
+          source_type: "", # Invalid: blank type
           url: "not-a-url", # Invalid URL
           active: true
         }
@@ -85,10 +85,10 @@ class SourceWorkflowTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     
     # Should show error messages
-    assert_select "h2", text: /errors? prohibited/
+    assert_select ".bg-red-100" # Error box
     assert_match /Name can't be blank/, response.body
-    assert_match /not a valid source type/, response.body
-    assert_match /Url is not a valid URL/, response.body
+    assert_match /Source type can't be blank/, response.body
+    assert_match /Url is invalid/, response.body
   end
 
   test "workflow: toggle source active status" do

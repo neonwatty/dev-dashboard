@@ -179,11 +179,11 @@ class FetchRedditJobTest < ActiveJob::TestCase
   end
 
   test "should process all active Reddit sources when no source_id provided" do
-    # Create another active Reddit source
+    # Create another active Reddit source with unique URL
     reddit_source2 = Source.create!(
-      name: "Programming Reddit",
+      name: "Ruby Reddit",
       source_type: "reddit",
-      url: "https://www.reddit.com/r/programming",
+      url: "https://www.reddit.com/r/ruby",
       config: '{}',
       active: true
     )
@@ -192,7 +192,7 @@ class FetchRedditJobTest < ActiveJob::TestCase
     stub_request(:get, /reddit\.com\/r\/MachineLearning\/hot\.json/)
       .to_return(status: 200, body: @reddit_response.to_json, headers: { 'Content-Type' => 'application/json' })
     
-    stub_request(:get, /reddit\.com\/r\/programming\/hot\.json/)
+    stub_request(:get, /reddit\.com\/r\/ruby\/hot\.json/)
       .to_return(status: 200, body: @reddit_response.to_json, headers: { 'Content-Type' => 'application/json' })
     
     # Should process both sources

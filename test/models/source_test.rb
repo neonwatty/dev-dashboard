@@ -41,10 +41,10 @@ class SourceTest < ActiveSupport::TestCase
   test "should accept http and https urls" do
     source = sources(:huggingface_forum)
     
-    source.url = "http://example.com"
+    source.url = "http://unique-example-test.com"
     assert source.valid?
     
-    source.url = "https://example.com"
+    source.url = "https://unique-example-test.com"
     assert source.valid?
   end
 
