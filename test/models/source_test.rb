@@ -108,6 +108,20 @@ class SourceTest < ActiveSupport::TestCase
     assert_equal({}, source.config_hash)
   end
 
+  test "config_hash should clean up malformed config with prefix" do
+    source = sources(:huggingface_forum)
+    source.config = 'Config: {"keywords": ["test"], "limit": 25}'
+    expected = {"keywords" => ["test"], "limit" => 25}
+    assert_equal expected, source.config_hash
+  end
+
+  test "config_hash should handle config with extra whitespace and newlines" do
+    source = sources(:huggingface_forum)
+    source.config = "Config: {\"keywords\": [\"test\"]}\r\n\r\n"
+    expected = {"keywords" => ["test"]}
+    assert_equal expected, source.config_hash
+  end
+
   test "config_hash= should set JSON config" do
     source = sources(:huggingface_forum)
     new_config = {"keywords" => ["ruby", "rails"], "max_items" => 50}

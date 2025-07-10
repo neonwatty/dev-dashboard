@@ -11,8 +11,19 @@ class Source < ApplicationRecord
   
   def config_hash
     return {} if config.blank?
-    JSON.parse(config)
-  rescue JSON::ParserError
+    
+    # Clean up common config formatting issues
+    cleaned_config = config.strip
+    
+    # Remove common prefixes that might be accidentally added
+    cleaned_config = cleaned_config.sub(/^Config:\s*/, '')
+    
+    # Remove extra whitespace and newlines
+    cleaned_config = cleaned_config.gsub(/\r\n|\r|\n/, '').strip
+    
+    JSON.parse(cleaned_config)
+  rescue JSON::ParserError => e
+    Rails.logger.warn "Invalid JSON config for source #{name}: #{e.message}. Config: #{config.inspect}"
     {}
   end
   

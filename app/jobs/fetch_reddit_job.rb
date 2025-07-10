@@ -25,8 +25,8 @@ class FetchRedditJob < ApplicationJob
       # Update source status
       source.update!(status: 'fetching...')
       
-      # Parse configuration
-      config = JSON.parse(source.config || '{}')
+      # Parse configuration using the robust config_hash method
+      config = source.config_hash
       
       # Extract subreddit from URL
       # URL format: https://www.reddit.com/r/MachineLearning or https://reddit.com/r/MachineLearning
