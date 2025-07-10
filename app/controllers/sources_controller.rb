@@ -124,14 +124,14 @@ class SourcesController < ApplicationController
     begin
       response = Net::HTTP.get_response(URI(@source.url))
       if response.code.to_i < 400
-        @source.update(status: 'ok')
+        @source.update_status_and_broadcast('ok')
         redirect_to @source, notice: 'Connection test successful!'
       else
-        @source.update(status: "error: HTTP #{response.code}")
+        @source.update_status_and_broadcast("error: HTTP #{response.code}")
         redirect_to @source, alert: "Connection failed: HTTP #{response.code}"
       end
     rescue => e
-      @source.update(status: "error: #{e.message}")
+      @source.update_status_and_broadcast("error: #{e.message}")
       redirect_to @source, alert: "Connection failed: #{e.message}"
     end
   end
