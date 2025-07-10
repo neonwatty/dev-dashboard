@@ -27,7 +27,8 @@ class PostsController < ApplicationController
     when 'recent'
       @posts = @posts.recent
     else
-      @posts = @posts.by_priority
+      # Default to most recent first
+      @posts = @posts.recent
     end
     
     @posts = @posts.page(params[:page]).per(20)
