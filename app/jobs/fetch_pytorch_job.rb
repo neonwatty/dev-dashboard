@@ -38,6 +38,7 @@ class FetchPytorchJob < ApplicationJob
         
         source.update!(last_fetched_at: Time.current)
         status_message = new_posts_count > 0 ? "ok (#{new_posts_count} new)" : "ok"
+        Rails.logger.info "Broadcasting status for #{source.name}: #{status_message}"
         source.update_status_and_broadcast(status_message)
       else
         source.update_status_and_broadcast("error: HTTP #{response.code}")

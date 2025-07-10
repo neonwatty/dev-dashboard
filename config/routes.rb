@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount ActionCable.server => '/cable'
+  
   resource :session
   resources :passwords, param: :token
   resources :registrations, only: [:new, :create]

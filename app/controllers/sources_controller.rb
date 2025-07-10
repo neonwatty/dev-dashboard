@@ -111,11 +111,15 @@ class SourcesController < ApplicationController
       false
     end
     
-    if job_queued
-      redirect_back(fallback_location: sources_path, notice: "#{job_queued} refresh job queued for #{@source.name}. Check back in a moment.")
-    else
-      @source.update_status_and_broadcast('error: unsupported source type')
-      redirect_back(fallback_location: sources_path, alert: "Refresh not supported for this source type yet.")
+    respond_to do |format|
+      if job_queued
+        format.html { redirect_back(fallback_location: sources_path, notice: "#{job_queued} refresh job queued for #{@source.name}. Check back in a moment.") }
+        format.turbo_stream { head :ok }
+      else
+        @source.update_status_and_broadcast('error: unsupported source type')
+        format.html { redirect_back(fallback_location: sources_path, alert: "Refresh not supported for this source type yet.") }
+        format.turbo_stream { head :ok }
+      end
     end
   end
   
