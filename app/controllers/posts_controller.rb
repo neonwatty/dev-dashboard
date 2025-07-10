@@ -1,4 +1,5 @@
 class PostsController < ApplicationController
+  allow_unauthenticated_access only: [:index, :show]
   before_action :set_post, only: [:show, :mark_as_read, :mark_as_ignored, :mark_as_responded]
   
   def index

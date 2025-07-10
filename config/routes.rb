@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  resource :session
+  resources :passwords, param: :token
+  resources :registrations, only: [:new, :create]
   resources :posts, only: [:index, :show] do
     member do
       patch :mark_as_read

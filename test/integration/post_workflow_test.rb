@@ -4,6 +4,8 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
   setup do
     @source = sources(:huggingface_forum)
     @post = posts(:huggingface_post)
+    @user = users(:one)
+    sign_in_as(@user)
   end
 
   test "complete workflow: view posts, filter, mark as read" do

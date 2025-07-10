@@ -1,6 +1,10 @@
 require "test_helper"
 
 class PostsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @user = users(:one)
+  end
+  
   test "should get index" do
     get posts_url
     assert_response :success
@@ -12,6 +16,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should mark post as read" do
+    sign_in_as(@user)
     post = posts(:huggingface_post)
     assert_equal 'unread', post.status
     
@@ -23,6 +28,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should mark post as ignored" do
+    sign_in_as(@user)
     post = posts(:huggingface_post)
     
     patch mark_as_ignored_post_url(post)
@@ -33,6 +39,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should mark post as responded" do
+    sign_in_as(@user)
     post = posts(:huggingface_post)
     
     patch mark_as_responded_post_url(post)

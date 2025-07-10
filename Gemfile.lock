@@ -76,6 +76,7 @@ GEM
       public_suffix (>= 2.0.2, < 7.0)
     ast (2.4.3)
     base64 (0.3.0)
+    bcrypt (3.1.20)
     bcrypt_pbkdf (1.1.1)
     benchmark (0.4.1)
     bigdecimal (3.2.2)
@@ -119,11 +120,6 @@ GEM
     et-orbi (1.2.11)
       tzinfo
     event_stream_parser (1.0.0)
-    factory_bot (6.5.4)
-      activesupport (>= 6.1.0)
-    factory_bot_rails (6.5.0)
-      factory_bot (~> 6.5)
-      railties (>= 6.1.0)
     faraday (2.13.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
@@ -464,12 +460,12 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  bcrypt (~> 3.1.7)
   bootsnap
   brakeman
   capybara
   debug
   discourse_api
-  factory_bot_rails
   feedjira
   jbuilder
   kamal

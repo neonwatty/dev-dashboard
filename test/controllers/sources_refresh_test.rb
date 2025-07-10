@@ -5,6 +5,8 @@ class SourcesRefreshTest < ActionDispatch::IntegrationTest
     @source = sources(:huggingface_forum)
     @github_source = sources(:rails_github)
     @rss_source = sources(:ruby_blog_rss)
+    @user = users(:one)
+    sign_in_as(@user)
   end
 
   test "should refresh individual discourse source" do

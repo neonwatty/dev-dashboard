@@ -5,6 +5,8 @@ class JobExecutionWorkflowTest < ActionDispatch::IntegrationTest
     @source = sources(:huggingface_forum)
     # Clear any existing posts to ensure clean test state
     Post.destroy_all
+    @user = users(:one)
+    sign_in_as(@user)
   end
 
   test "workflow: fetch posts from source and view them" do

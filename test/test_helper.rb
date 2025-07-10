@@ -42,6 +42,11 @@ module ActiveSupport
       stub_request(:get, url)
         .to_return(status: status, body: '{"error": "API Error"}', headers: { 'Content-Type' => 'application/json' })
     end
+
+    # Helper method to sign in a user for tests
+    def sign_in_as(user)
+      post session_url, params: { email_address: user.email_address, password: 'password' }
+    end
   end
 end
 

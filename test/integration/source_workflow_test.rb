@@ -3,6 +3,8 @@ require "test_helper"
 class SourceWorkflowTest < ActionDispatch::IntegrationTest
   setup do
     @source = sources(:huggingface_forum)
+    @user = users(:one)
+    sign_in_as(@user)
   end
 
   test "complete source CRUD workflow" do
