@@ -30,7 +30,7 @@ class FetchRssJob < ApplicationJob
       response = Net::HTTP.get_response(uri)
       
       unless response.code == '200'
-        source.update!(status: "error: HTTP #{response.code}")
+        source.update_status_and_broadcast("error: HTTP #{response.code}")
         return
       end
 
@@ -38,7 +38,7 @@ class FetchRssJob < ApplicationJob
       feed = Feedjira.parse(response.body)
       
       if feed.nil?
-        source.update!(status: "error: Invalid RSS feed format")
+        source.update_status_and_broadcast("error: Invalid RSS feed format")
         return
       end
 
@@ -60,23 +60,22 @@ class FetchRssJob < ApplicationJob
         end
       end
 
-      source.update!(
-        last_fetched_at: Time.current,
-        status: "ok (#{processed_count} new items)"
-      )
+      source.update!(last_fetched_at: Time.current)
+      status_message = processed_count > 0 ? "ok (#{processed_count} new)" : "ok"
+      source.update_status_and_broadcast(status_message)
       
       Rails.logger.info "RSS feed #{source.name}: processed #{processed_count} items"
 
     rescue Feedjira::NoParserAvailable => e
       Rails.logger.error "RSS parsing error for #{source.name}: #{e.message}"
-      source.update!(status: "error: Unsupported feed format")
+      source.update_status_and_broadcast("error: Unsupported feed format")
     rescue Timeout::Error => e
       Rails.logger.error "RSS timeout for #{source.name}: #{e.message}"
-      source.update!(status: "error: Request timeout")
+      source.update_status_and_broadcast("error: Request timeout")
     rescue => e
       Rails.logger.error "RSS error for #{source.name}: #{e.message}"
       Rails.logger.error "Full error: #{e.inspect}"
-      source.update!(status: "error: #{e.message}")
+      source.update_status_and_broadcast("error: #{e.message}")
     end
   end
 

@@ -23,7 +23,7 @@ class FetchRedditJob < ApplicationJob
     
     begin
       # Update source status
-      source.update!(status: 'fetching...')
+      source.update_status_and_broadcast('refreshing...')
       
       # Parse configuration using the robust config_hash method
       config = source.config_hash
@@ -33,7 +33,7 @@ class FetchRedditJob < ApplicationJob
       subreddit = extract_subreddit_from_url(source.url)
       
       if subreddit.blank?
-        source.update!(status: 'error: invalid subreddit URL')
+        source.update_status_and_broadcast('error: invalid subreddit URL')
         return
       end
       
@@ -41,7 +41,7 @@ class FetchRedditJob < ApplicationJob
       posts_data = fetch_reddit_posts(subreddit, config)
       
       if posts_data.nil?
-        source.update!(status: 'error: failed to fetch posts')
+        source.update_status_and_broadcast('error: failed to fetch posts')
         return
       end
       
@@ -101,16 +101,15 @@ class FetchRedditJob < ApplicationJob
       end
       
       # Update source status
-      source.update!(
-        status: 'ok',
-        last_fetched_at: Time.current
-      )
+      source.update!(last_fetched_at: Time.current)
+      status_message = posts_created > 0 ? "ok (#{posts_created} new)" : "ok"
+      source.update_status_and_broadcast(status_message)
       
       Rails.logger.info "Successfully fetched #{posts_created} new posts from r/#{subreddit}"
       
     rescue => e
       Rails.logger.error "Error fetching from Reddit source #{source.name}: #{e.message}"
-      source.update!(status: "error: #{e.message}")
+      source.update_status_and_broadcast("error: #{e.message}")
     end
   end
 

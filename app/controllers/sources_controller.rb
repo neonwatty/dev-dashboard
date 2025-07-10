@@ -12,7 +12,7 @@ class SourcesController < ApplicationController
     job_count = 0
     
     active_sources.each do |source|
-      source.update!(status: 'refreshing...')
+      source.update_status_and_broadcast('refreshing...')
       
       case source.source_type
       when 'discourse'
@@ -79,7 +79,7 @@ class SourcesController < ApplicationController
   
   def refresh
     # Update status to indicate refresh is in progress
-    @source.update!(status: 'refreshing...')
+    @source.update_status_and_broadcast('refreshing...')
     
     # Queue the appropriate job
     job_queued = case @source.source_type
@@ -114,7 +114,7 @@ class SourcesController < ApplicationController
     if job_queued
       redirect_back(fallback_location: sources_path, notice: "#{job_queued} refresh job queued for #{@source.name}. Check back in a moment.")
     else
-      @source.update!(status: 'error: unsupported source type')
+      @source.update_status_and_broadcast('error: unsupported source type')
       redirect_back(fallback_location: sources_path, alert: "Refresh not supported for this source type yet.")
     end
   end

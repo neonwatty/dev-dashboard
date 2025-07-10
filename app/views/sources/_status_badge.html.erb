@@ -1,0 +1,17 @@
+<%= turbo_frame_tag "source_#{source.id}_status" do %>
+  <% if source.status == 'refreshing...' %>
+    <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-yellow-500 rounded animate-pulse">
+      Refreshing...
+    </span>
+  <% elsif source.status&.start_with?('ok') %>
+    <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-green-500 rounded">
+      <%= source.status %>
+    </span>
+  <% elsif source.status.present? %>
+    <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded" title="<%= source.status %>">
+      <%= source.status.start_with?('error:') ? 'Error' : source.status.truncate(20) %>
+    </span>
+  <% else %>
+    <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-gray-500 rounded">Unknown</span>
+  <% end %>
+<% end %>

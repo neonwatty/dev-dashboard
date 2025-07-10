@@ -29,29 +29,33 @@ class FetchPytorchJob < ApplicationJob
         data = JSON.parse(response.body)
         topics = data['topic_list']['topics']
         
+        new_posts_count = 0
         topics.each do |topic|
-          create_post_from_topic(topic, source)
+          if create_post_from_topic(topic, source)
+            new_posts_count += 1
+          end
         end
         
-        source.update!(
-          last_fetched_at: Time.current,
-          status: 'ok'
-        )
+        source.update!(last_fetched_at: Time.current)
+        status_message = new_posts_count > 0 ? "ok (#{new_posts_count} new)" : "ok"
+        source.update_status_and_broadcast(status_message)
       else
-        source.update!(status: "error: HTTP #{response.code}")
+        source.update_status_and_broadcast("error: HTTP #{response.code}")
       end
     rescue => e
       Rails.logger.error "Error fetching from #{source.name}: #{e.message}"
       Rails.logger.error "Full error: #{e.inspect}"
-      source.update!(status: "error: #{e.message}")
+      source.update_status_and_broadcast("error: #{e.message}")
     end
   end
 
   def create_post_from_topic(topic, source)
-    Post.find_or_create_by(
+    post = Post.find_or_initialize_by(
       source: 'pytorch',
       external_id: topic['id'].to_s
-    ) do |post|
+    )
+    
+    if post.new_record?
       post.title = topic['title']
       slug = topic['slug'] || "topic-#{topic['id']}"
       post.url = "#{source.url}/t/#{slug}/#{topic['id']}"
@@ -61,7 +65,11 @@ class FetchPytorchJob < ApplicationJob
       post.tags = topic['tags'].to_json if topic['tags']
       post.status = 'unread'
       post.priority_score = calculate_priority_score(topic)
+      post.save!
+      return true
     end
+    
+    false
   end
 
   def calculate_priority_score(topic)

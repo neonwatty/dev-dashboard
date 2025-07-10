@@ -36,4 +36,28 @@ class Source < ApplicationRecord
   def connection_ok?
     status == 'ok'
   end
+  
+  # Broadcasting methods for real-time updates
+  def broadcast_status_update
+    # Broadcast to the source-specific channel (for show page)
+    broadcast_replace_to(
+      "source_status:#{id}",
+      target: "source_#{id}_status",
+      partial: "sources/status_badge",
+      locals: { source: self }
+    )
+    
+    # Broadcast to the all sources channel (for index page)
+    broadcast_replace_to(
+      "source_status:all",
+      target: "source_#{id}_status",
+      partial: "sources/status_badge",
+      locals: { source: self }
+    )
+  end
+  
+  def update_status_and_broadcast(new_status)
+    update!(status: new_status)
+    broadcast_status_update
+  end
 end

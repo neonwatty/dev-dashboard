@@ -45,17 +45,16 @@ class FetchHackerNewsJob < ApplicationJob
         processed_count += fetch_stories_by_type(story_type, min_score, max_items / story_types.length, keywords)
       end
 
-      source.update!(
-        last_fetched_at: Time.current,
-        status: "ok (#{processed_count} new items)"
-      )
+      source.update!(last_fetched_at: Time.current)
+      status_message = processed_count > 0 ? "ok (#{processed_count} new)" : "ok"
+      source.update_status_and_broadcast(status_message)
       
       Rails.logger.info "Hacker News: processed #{processed_count} items"
 
     rescue => e
       Rails.logger.error "Hacker News error: #{e.message}"
       Rails.logger.error "Full error: #{e.inspect}"
-      source.update!(status: "error: #{e.message}")
+      source.update_status_and_broadcast("error: #{e.message}")
     end
   end
 

@@ -68,14 +68,16 @@ class FetchGithubIssuesJob < ApplicationJob
         # Filter out pull requests (GitHub API includes PRs in issues endpoint)
         issues = issues.reject { |issue| issue['pull_request'] }
         
+        new_posts_count = 0
         issues.each do |issue|
-          create_post_from_issue(issue, source)
+          if create_post_from_issue(issue, source)
+            new_posts_count += 1
+          end
         end
         
-        source.update!(
-          last_fetched_at: Time.current,
-          status: 'ok'
-        )
+        source.update!(last_fetched_at: Time.current)
+        status_message = new_posts_count > 0 ? "ok (#{new_posts_count} new)" : "ok"
+        source.update_status_and_broadcast(status_message)
       else
         error_msg = "HTTP #{response.code}"
         if response.code == '403'
@@ -83,20 +85,22 @@ class FetchGithubIssuesJob < ApplicationJob
         elsif response.code == '404'
           error_msg += " - Repository not found"
         end
-        source.update!(status: "error: #{error_msg}")
+        source.update_status_and_broadcast("error: #{error_msg}")
       end
     rescue => e
       Rails.logger.error "Error fetching from #{source.name}: #{e.message}"
       Rails.logger.error "Full error: #{e.inspect}"
-      source.update!(status: "error: #{e.message}")
+      source.update_status_and_broadcast("error: #{e.message}")
     end
   end
 
   def create_post_from_issue(issue, source)
-    Post.find_or_create_by(
+    post = Post.find_or_initialize_by(
       source: 'github',
       external_id: issue['number'].to_s
-    ) do |post|
+    )
+    
+    if post.new_record?
       post.title = issue['title']
       post.url = issue['html_url']
       post.author = issue['user']['login']
@@ -105,7 +109,11 @@ class FetchGithubIssuesJob < ApplicationJob
       post.tags = extract_labels(issue['labels'])
       post.status = 'unread'
       post.priority_score = calculate_priority_score(issue)
+      post.save!
+      return true
     end
+    
+    false
   end
 
   def calculate_priority_score(issue)
