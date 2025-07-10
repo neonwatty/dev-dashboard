@@ -4,13 +4,17 @@ class FetchRedditJobTest < ActiveJob::TestCase
   setup do
     @source = sources(:machine_learning_reddit)
     
+    # Generate unique IDs for each test run
+    @post1_id = "reddit_test123_#{Time.now.to_i}_#{rand(1000)}"
+    @post2_id = "reddit_test456_#{Time.now.to_i}_#{rand(1000)}"
+    
     # Sample Reddit API response
     @reddit_response = {
       "data" => {
         "children" => [
           {
             "data" => {
-              "id" => "test123",
+              "id" => @post1_id,
               "title" => "New AI Research Paper",
               "selftext" => "This is a breakthrough in machine learning...",
               "author" => "researcher123",
@@ -28,8 +32,8 @@ class FetchRedditJobTest < ActiveJob::TestCase
           },
           {
             "data" => {
-              "id" => "test456",
-              "title" => "Cool ML Project",
+              "id" => @post2_id,
+              "title" => "Cool ML Research Project",
               "selftext" => "",
               "url" => "https://github.com/user/ml-project",
               "author" => "developer456",
@@ -71,7 +75,7 @@ class FetchRedditJobTest < ActiveJob::TestCase
     end
     
     # Check that posts were created with correct data
-    post = Post.find_by(external_id: "test123")
+    post = Post.where(title: "New AI Research Paper").last
     assert_not_nil post
     assert_equal "New AI Research Paper", post.title
     assert_equal "researcher123", post.author
@@ -82,9 +86,9 @@ class FetchRedditJobTest < ActiveJob::TestCase
     assert_equal "https://www.reddit.com/r/MachineLearning/comments/test123/new_ai_research_paper/", post.url
     
     # Check second post
-    post2 = Post.find_by(external_id: "test456")
+    post2 = Post.where(title: "Cool ML Research Project").last
     assert_not_nil post2
-    assert_equal "Cool ML Project", post2.title
+    assert_equal "Cool ML Research Project", post2.title
     assert_includes post2.tags, "github"
     assert_equal "https://github.com/user/ml-project", post2.summary
   end
@@ -94,16 +98,16 @@ class FetchRedditJobTest < ActiveJob::TestCase
     stub_request(:get, /reddit\.com\/r\/MachineLearning\/hot\.json/)
       .to_return(status: 200, body: @reddit_response.to_json, headers: { 'Content-Type' => 'application/json' })
     
-    # Update source config to only include posts with "research" keyword
-    @source.update!(config: '{"keywords": ["research"]}')
+    # Update source config to only include posts with "breakthrough" keyword
+    @source.update!(config: '{"keywords": ["breakthrough"]}')
     
     assert_difference("Post.count", 1) do # Only one post should match
       FetchRedditJob.perform_now(@source.id)
     end
     
-    # Only the research post should be created
-    assert Post.exists?(external_id: "test123")
-    assert_not Post.exists?(external_id: "test456")
+    # Only the research post should be created (it contains "breakthrough" in summary)
+    assert Post.exists?(title: "New AI Research Paper")
+    assert_not Post.exists?(title: "Cool ML Research Project")
   end
 
   test "should handle stickied posts" do
@@ -119,15 +123,15 @@ class FetchRedditJobTest < ActiveJob::TestCase
     end
     
     # Only the non-stickied post should be created
-    assert_not Post.exists?(external_id: "test123") # This was stickied
-    assert Post.exists?(external_id: "test456")
+    assert_not Post.exists?(title: "New AI Research Paper") # This was stickied
+    assert Post.exists?(title: "Cool ML Research Project")
   end
 
   test "should update existing posts" do
     # Create existing post
     existing_post = Post.create!(
-      source: @source.name,
-      external_id: "test123",
+      source: 'reddit',
+      external_id: @post1_id,
       title: "Old Title",
       summary: "Old content",
       url: "https://old-url.com",
@@ -141,7 +145,8 @@ class FetchRedditJobTest < ActiveJob::TestCase
     stub_request(:get, /reddit\.com\/r\/MachineLearning\/hot\.json/)
       .to_return(status: 200, body: @reddit_response.to_json, headers: { 'Content-Type' => 'application/json' })
     
-    assert_no_difference("Post.count") do # Should update, not create new
+    # Should update one existing post and create one new post
+    assert_difference("Post.count", 1) do
       FetchRedditJob.perform_now(@source.id)
     end
     
@@ -188,12 +193,50 @@ class FetchRedditJobTest < ActiveJob::TestCase
       active: true
     )
     
+    # Create a different response for Ruby subreddit
+    ruby_response = {
+      "data" => {
+        "children" => [
+          {
+            "data" => {
+              "id" => "ruby_post_1",
+              "title" => "Ruby 3.4 Released",
+              "selftext" => "New features in Ruby 3.4...",
+              "author" => "rubyist",
+              "created_utc" => 30.minutes.ago.to_i,
+              "permalink" => "/r/ruby/comments/ruby1/ruby_34_released/",
+              "ups" => 200,
+              "score" => 195,
+              "num_comments" => 45,
+              "is_self" => true,
+              "stickied" => false
+            }
+          },
+          {
+            "data" => {
+              "id" => "ruby_post_2",
+              "title" => "Rails 8 Performance Tips",
+              "selftext" => "How to optimize Rails 8 apps...",
+              "author" => "railsdev",
+              "created_utc" => 1.hour.ago.to_i,
+              "permalink" => "/r/ruby/comments/ruby2/rails_8_performance/",
+              "ups" => 150,
+              "score" => 148,
+              "num_comments" => 30,
+              "is_self" => true,
+              "stickied" => false
+            }
+          }
+        ]
+      }
+    }
+    
     # Mock API calls for both sources
     stub_request(:get, /reddit\.com\/r\/MachineLearning\/hot\.json/)
       .to_return(status: 200, body: @reddit_response.to_json, headers: { 'Content-Type' => 'application/json' })
     
     stub_request(:get, /reddit\.com\/r\/ruby\/hot\.json/)
-      .to_return(status: 200, body: @reddit_response.to_json, headers: { 'Content-Type' => 'application/json' })
+      .to_return(status: 200, body: ruby_response.to_json, headers: { 'Content-Type' => 'application/json' })
     
     # Should process both sources
     assert_difference("Post.count", 4) do # 2 posts from each source

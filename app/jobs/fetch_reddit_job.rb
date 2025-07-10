@@ -45,17 +45,27 @@ class FetchRedditJob < ApplicationJob
         return
       end
       
+      Rails.logger.debug "Fetched #{posts_data.size} posts from Reddit"
+      
       # Process posts
       posts_created = 0
-      posts_data.each do |post_data|
+      posts_data.each_with_index do |post_data, index|
+        Rails.logger.debug "Processing Reddit post [#{index}]: #{post_data.dig('data', 'id')} - #{post_data.dig('data', 'title')}"
+        
         next if post_data.dig('data', 'stickied') # Skip stickied posts
         # Skip posts that have no content (neither text nor external URL)
-        next if post_data.dig('data', 'is_self') == false && 
-               post_data.dig('data', 'url').blank? && 
-               post_data.dig('data', 'selftext').blank?
+        if post_data.dig('data', 'is_self') == false && 
+           post_data.dig('data', 'url').blank? && 
+           post_data.dig('data', 'selftext').blank?
+          Rails.logger.debug "Skipping post due to no content"
+          next
+        end
         
         post_info = extract_post_info(post_data['data'], subreddit)
-        next if post_info.nil?
+        if post_info.nil?
+          Rails.logger.debug "Skipping post - extract_post_info returned nil"
+          next
+        end
         
         # Apply keyword filtering if configured
         if config['keywords'].present?
@@ -67,9 +77,11 @@ class FetchRedditJob < ApplicationJob
         
         # Check if post already exists
         existing_post = Post.find_by(
-          source: source.name,
+          source: 'reddit',
           external_id: post_info[:external_id]
         )
+        
+        Rails.logger.debug "Post #{post_info[:external_id]} - Existing: #{existing_post.present?}"
         
         if existing_post
           # Update existing post
@@ -84,19 +96,24 @@ class FetchRedditJob < ApplicationJob
           )
         else
           # Create new post
-          Post.create!(
-            source: source.name,
-            external_id: post_info[:external_id],
-            title: post_info[:title],
-            summary: post_info[:summary],
-            url: post_info[:url],
-            author: post_info[:author],
-            posted_at: post_info[:posted_at],
-            priority_score: post_info[:priority_score],
-            tags: post_info[:tags],
-            status: 'unread'
-          )
-          posts_created += 1
+          begin
+            Post.create!(
+              source: 'reddit',
+              external_id: post_info[:external_id],
+              title: post_info[:title],
+              summary: post_info[:summary],
+              url: post_info[:url],
+              author: post_info[:author],
+              posted_at: post_info[:posted_at],
+              priority_score: post_info[:priority_score],
+              tags: post_info[:tags],
+              status: 'unread'
+            )
+            posts_created += 1
+          rescue => e
+            Rails.logger.error "Failed to create Reddit post: #{e.message}"
+            Rails.logger.error "Post info: #{post_info.inspect}"
+          end
         end
       end
       
@@ -154,7 +171,7 @@ class FetchRedditJob < ApplicationJob
     
     # Extract basic info
     title = post_data['title']
-    content = post_data['selftext'] || post_data['url'] || ''
+    content = post_data['selftext'].presence || post_data['url'] || ''
     author = post_data['author']
     external_id = post_data['id']
     created_utc = post_data['created_utc']
