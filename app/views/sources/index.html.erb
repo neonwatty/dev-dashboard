@@ -3,9 +3,10 @@
     <h1 class="text-3xl font-bold text-gray-900">Sources</h1>
     <div class="flex space-x-4">
       <%= link_to "Dashboard", root_path, class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
-      <%= link_to refresh_all_sources_path, method: :post, 
-                 data: { confirm: "This will refresh all active sources. Continue?" },
-                 class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center" do %>
+      <%= button_to refresh_all_sources_path, 
+                   method: :post, 
+                   data: { turbo_confirm: "This will refresh all active sources. Continue?" },
+                   class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center" do %>
         <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
         </svg>
@@ -70,21 +71,26 @@
                   <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-gray-500 rounded">Inactive</span>
                 <% end %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                <%= link_to "Test", test_connection_source_path(source), method: :post, 
-                           class: "text-blue-600 hover:text-blue-900 transition-colors" %>
-                <%= link_to refresh_source_path(source), method: :post, 
-                           class: "text-green-600 hover:text-green-900 transition-colors inline-flex items-center",
-                           data: { disable_with: "Refreshing..." } do %>
-                  <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                  </svg>
-                  Refresh
-                <% end %>
-                <%= link_to "Edit", edit_source_path(source), class: "text-yellow-600 hover:text-yellow-900 transition-colors" %>
-                <%= link_to "Delete", source, method: :delete, 
-                           data: { confirm: "Are you sure?" }, 
-                           class: "text-red-600 hover:text-red-900 transition-colors" %>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex items-center space-x-2">
+                  <%= button_to "Test", test_connection_source_path(source), 
+                               method: :post, 
+                               class: "text-blue-600 hover:text-blue-900 transition-colors text-sm" %>
+                  <%= button_to refresh_source_path(source), 
+                               method: :post, 
+                               class: "text-green-600 hover:text-green-900 transition-colors inline-flex items-center text-sm",
+                               data: { disable_with: "Refreshing..." } do %>
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Refresh
+                  <% end %>
+                  <%= link_to "Edit", edit_source_path(source), class: "text-yellow-600 hover:text-yellow-900 transition-colors text-sm" %>
+                  <%= button_to "Delete", source, 
+                               method: :delete, 
+                               data: { turbo_confirm: "Are you sure?" }, 
+                               class: "text-red-600 hover:text-red-900 transition-colors text-sm" %>
+                </div>
               </td>
             </tr>
           <% end %>
