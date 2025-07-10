@@ -78,13 +78,13 @@
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Actions</h2>
       
       <div class="space-y-4">
-        <%= link_to "Test Connection", test_connection_source_path(@source), 
-                   method: :post, 
-                   class: "w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-center block" %>
+        <%= button_to "Test Connection", test_connection_source_path(@source), 
+                     method: :post, 
+                     class: "w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded text-center block" %>
         
-        <%= link_to "Refresh Content", refresh_source_path(@source), 
-                   method: :post, 
-                   class: "w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-center block" %>
+        <%= button_to "Refresh Content", refresh_source_path(@source), 
+                     method: :post, 
+                     class: "w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-center block" %>
         
         <% if @source.active? %>
           <%= link_to "Deactivate", edit_source_path(@source), 
@@ -94,10 +94,10 @@
                      class: "w-full bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-4 rounded text-center block" %>
         <% end %>
         
-        <%= link_to "Delete Source", @source, 
-                   method: :delete, 
-                   confirm: "Are you sure? This will remove all posts from this source.", 
-                   class: "w-full bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded text-center block" %>
+        <%= button_to "Delete Source", @source, 
+                     method: :delete, 
+                     data: { turbo_confirm: "Are you sure? This will remove all posts from this source." },
+                     class: "w-full bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-4 rounded text-center block" %>
       </div>
     </div>
   </div>
@@ -106,7 +106,7 @@
   <div class="mt-8 bg-white rounded-lg shadow-md p-6">
     <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Posts from This Source</h2>
     
-    <% recent_posts = Post.where(source: @source.name.downcase.gsub(/\s+/, '').gsub(/[^a-z0-9]/, '')).limit(10) %>
+    <% recent_posts = Post.where(source: @source.name).limit(10) %>
     <% if recent_posts.any? %>
       <div class="space-y-4">
         <% recent_posts.each do |post| %>
