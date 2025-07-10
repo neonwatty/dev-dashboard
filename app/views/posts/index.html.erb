@@ -14,8 +14,9 @@
             </svg>
             Add Source
           <% end %>
-          <%= link_to refresh_all_sources_path, method: :post, 
-                     data: { confirm: "This will refresh all active sources. Continue?", disable_with: "Refreshing..." },
+          <%= button_to refresh_all_sources_path, 
+                     method: :post,
+                     data: { turbo_confirm: "This will refresh all active sources. Continue?", disable_with: "Refreshing..." },
                      class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors" do %>
             <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -167,12 +168,15 @@
             
             <% if authenticated? %>
               <div class="flex flex-col space-y-1">
-                <%= link_to "Read", mark_as_read_post_path(post), method: :patch, 
-                           class: "text-xs bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded transition-colors" %>
-                <%= link_to "Ignore", mark_as_ignored_post_path(post), method: :patch, 
-                           class: "text-xs bg-gray-500 hover:bg-gray-600 text-white font-medium py-1 px-2 rounded transition-colors" %>
-                <%= link_to "Responded", mark_as_responded_post_path(post), method: :patch, 
-                           class: "text-xs bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-2 rounded transition-colors" %>
+                <%= button_to "Read", mark_as_read_post_path(post), 
+                           method: :patch,
+                           class: "text-xs bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded transition-colors w-full" %>
+                <%= button_to "Ignore", mark_as_ignored_post_path(post), 
+                           method: :patch,
+                           class: "text-xs bg-gray-500 hover:bg-gray-600 text-white font-medium py-1 px-2 rounded transition-colors w-full" %>
+                <%= button_to "Responded", mark_as_responded_post_path(post), 
+                           method: :patch,
+                           class: "text-xs bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-2 rounded transition-colors w-full" %>
               </div>
             <% end %>
           </div>
