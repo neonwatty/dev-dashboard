@@ -6,8 +6,10 @@ class RefreshAllTest < ActionDispatch::IntegrationTest
     @source1 = sources(:huggingface_forum)
     @source2 = sources(:pytorch_forum)
     
-    # Ensure only these sources are active
-    Source.update_all(active: false)
+    # Ensure only these sources are active by deactivating all others
+    Source.where.not(id: [@source1.id, @source2.id]).update_all(active: false)
+    
+    # Make sure our two sources are active
     @source1.update!(active: true)
     @source2.update!(active: true)
   end
@@ -27,6 +29,10 @@ class RefreshAllTest < ActionDispatch::IntegrationTest
   test "refresh all button should work correctly" do
     sign_in_as(@user)
     
+    # Reload sources to ensure they have the updated active status
+    @source1.reload
+    @source2.reload
+    
     # Visit the posts page first
     get posts_path
     assert_response :success
@@ -35,15 +41,17 @@ class RefreshAllTest < ActionDispatch::IntegrationTest
     active_count = Source.active.count
     assert_equal 2, active_count, "Expected 2 active sources, got #{active_count}"
     
-    # Click the refresh all button
-    post refresh_all_sources_path
+    # Click the refresh all button with job assertions
+    assert_enqueued_jobs 2 do
+      post refresh_all_sources_path
+    end
     
     assert_redirected_to sources_path
     follow_redirect!
     
     # Check flash message
     assert_not_nil flash[:notice], "Flash notice should be set"
-    assert_match(/Queued \d+ refresh jobs/, flash[:notice])
+    assert_match(/Queued 2 refresh jobs/, flash[:notice])
     
     # Check that sources are marked as refreshing
     @source1.reload
