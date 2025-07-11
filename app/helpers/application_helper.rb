@@ -30,13 +30,15 @@ module ApplicationHelper
   end
 
   def source_display_color(source_name)
-    case source_name
+    case source_name.downcase
     when 'huggingface'
       'yellow'
     when 'pytorch'
       'orange'
     when 'github'
       'gray'
+    when 'reddit'
+      'orange'
     when 'rss'
       'green'
     when 'hackernews'
