@@ -17,7 +17,7 @@
       <div class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Type</label>
-          <span class="inline-block px-3 py-1 text-sm font-semibold text-white bg-<%= source_type_color(@source.source_type) %>-500 rounded">
+          <span class="inline-block px-3 py-1 text-sm font-semibold text-white <%= source_type_badge_class(@source.source_type) %> rounded">
             <%= @source.source_type.titleize %>
           </span>
         </div>
