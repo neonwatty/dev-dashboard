@@ -55,20 +55,20 @@ class SourcesRefreshTest < ActionDispatch::IntegrationTest
   end
 
   test "should handle unsupported source type" do
-    # Create a Reddit source (not yet supported)
-    reddit_source = Source.create!(
-      name: "Reddit Programming",
-      source_type: "reddit",
-      url: "https://reddit.com/r/programming",
+    # Create a source with a valid type but unsupported URL pattern
+    unsupported_source = Source.create!(
+      name: "Unknown Source",
+      source_type: "discourse",
+      url: "https://unknown.example.com",
       active: true
     )
     
     assert_no_enqueued_jobs do
-      post refresh_source_path(reddit_source)
+      post refresh_source_path(unsupported_source)
     end
     
-    reddit_source.reload
-    assert_equal 'error: unsupported source type', reddit_source.status
+    unsupported_source.reload
+    assert_equal 'error: unsupported source type', unsupported_source.status
     assert_redirected_to sources_path
     assert_equal "Refresh not supported for this source type yet.", flash[:alert]
   end
@@ -134,17 +134,23 @@ class SourcesRefreshTest < ActionDispatch::IntegrationTest
     get sources_path
     assert_response :success
     
-    # Check for refresh all button
-    assert_select "a[href='#{refresh_all_sources_path}']", text: /Refresh All Active/
+    # Check for refresh all button (it's a form button, not a link)
+    assert_select "form[action='#{refresh_all_sources_path}']" do
+      assert_select "button", text: /Refresh All Active/
+    end
     
     # Check for individual refresh buttons
-    assert_select "a[href='#{refresh_source_path(@source)}']", text: /Refresh/
+    assert_select "form[action='#{refresh_source_path(@source)}']" do
+      assert_select "button", text: /Refresh/
+    end
   end
 
   test "refresh button should be visible on source show page" do
     get source_path(@source)
     assert_response :success
     
-    assert_select "a[href='#{refresh_source_path(@source)}']", text: /Refresh Content/
+    assert_select "form[action='#{refresh_source_path(@source)}']" do
+      assert_select "button", text: /Refresh Content/
+    end
   end
 end

@@ -40,7 +40,7 @@ class JobExecutionWorkflowTest < ActionDispatch::IntegrationTest
 
     # Verify source was updated
     @source.reload
-    assert_equal "ok", @source.status
+    assert_equal "ok (1 new)", @source.status
     assert_not_nil @source.last_fetched_at
 
     # Visit posts page
@@ -48,9 +48,9 @@ class JobExecutionWorkflowTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     # Verify the fetched post appears
-    assert_select "h2", "Integration Test Topic"
-    assert_select "span", text: "test_user"
-    assert_select "span", text: "unread"
+    assert_select "h3", "Integration Test Topic"
+    assert_select "span", text: "by test_user"
+    assert_select "span", text: "Unread"
 
     # Click on the post to mark as read
     post = Post.last
@@ -152,16 +152,16 @@ class JobExecutionWorkflowTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     # All posts should be visible
-    assert_select "h2", "HuggingFace Topic"
-    assert_select "h2", "GitHub Issue"
-    assert_select "h2", "PyTorch Topic"
+    assert_select "h3", "HuggingFace Topic"
+    assert_select "h3", "GitHub Issue"
+    assert_select "h3", "PyTorch Topic"
 
     # Filter by source
     get posts_path(source: "huggingface")
     assert_response :success
-    assert_select "h2", "HuggingFace Topic"
-    assert_select "h2", text: "GitHub Issue", count: 0
-    assert_select "h2", text: "PyTorch Topic", count: 0
+    assert_select "h3", "HuggingFace Topic"
+    assert_select "h3", text: "GitHub Issue", count: 0
+    assert_select "h3", text: "PyTorch Topic", count: 0
   end
 
   test "workflow: prevent duplicate posts on repeated job runs" do
@@ -251,6 +251,7 @@ class JobExecutionWorkflowTest < ActionDispatch::IntegrationTest
     stub_request(:get, rss_source.url)
       .to_return(status: 200, body: rss_content)
 
+    
     # Execute RSS job - should only create posts matching keywords
     assert_difference("Post.count", 2) do  # Rails and Ruby posts only
       FetchRssJob.perform_now(rss_source.id)
@@ -261,11 +262,11 @@ class JobExecutionWorkflowTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     # Should see Rails and Ruby posts
-    assert_select "h2", "Rails 8 Performance Guide"
-    assert_select "h2", "Ruby Metaprogramming Tips"
+    assert_select "h3", "Rails 8 Performance Guide"
+    assert_select "h3", "Ruby Metaprogramming Tips"
     
     # Should NOT see JavaScript post
-    assert_select "h2", text: "JavaScript Framework Comparison", count: 0
+    assert_select "h3", text: "JavaScript Framework Comparison", count: 0
   end
 
   test "workflow: priority score affects post ordering" do
@@ -303,12 +304,12 @@ class JobExecutionWorkflowTest < ActionDispatch::IntegrationTest
       priority_score: 2.0
     )
 
-    # Visit posts page (default sort is by priority)
-    get posts_path
+    # Visit posts page with priority sort (default is now recent)
+    get posts_path(sort: 'priority')
     assert_response :success
 
     # Posts should be ordered by priority score (high to low)
-    post_titles = css_select("h2").map(&:text).map(&:strip)
+    post_titles = css_select("h3 a").map(&:text).map(&:strip)
     expected_order = [
       "High Priority Post",
       "Medium Priority Post", 

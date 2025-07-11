@@ -27,6 +27,7 @@ class FetchRssJob < ApplicationJob
       
       # Use Net::HTTP for better error handling
       uri = URI(source.url)
+      
       response = Net::HTTP.get_response(uri)
       
       unless response.code == '200'
@@ -84,12 +85,12 @@ class FetchRssJob < ApplicationJob
     external_id = entry.entry_id || entry.url || Digest::MD5.hexdigest(entry.title + entry.url.to_s)
     
     # Check if post already exists
-    existing_post = Post.find_by(source: 'rss', external_id: external_id)
+    existing_post = Post.find_by(source: source.name, external_id: external_id)
     return false if existing_post
 
     # Create new post
     Post.create!(
-      source: 'rss',
+      source: source.name,
       external_id: external_id,
       title: clean_title(entry.title),
       url: entry.url,
@@ -120,7 +121,14 @@ class FetchRssJob < ApplicationJob
   end
 
   def extract_author(entry)
-    author = entry.author || entry.itunes_author || 'Unknown'
+    # Try different author fields, some may not exist on all entry types
+    author = 'Unknown'
+    
+    if entry.respond_to?(:author) && entry.author.present?
+      author = entry.author
+    elsif entry.respond_to?(:itunes_author) && entry.itunes_author.present?
+      author = entry.itunes_author
+    end
     
     # Clean up author name
     if author.is_a?(String)
@@ -131,7 +139,16 @@ class FetchRssJob < ApplicationJob
   end
 
   def extract_summary(entry)
-    summary = entry.summary || entry.content || entry.description || ''
+    summary = ''
+    
+    # Try different summary fields
+    if entry.respond_to?(:summary) && entry.summary.present?
+      summary = entry.summary
+    elsif entry.respond_to?(:content) && entry.content.present?
+      summary = entry.content
+    elsif entry.respond_to?(:description) && entry.description.present?
+      summary = entry.description
+    end
     
     # Clean HTML tags and truncate
     if summary.present?
@@ -146,7 +163,7 @@ class FetchRssJob < ApplicationJob
     tags = []
     
     # Extract categories
-    if entry.categories.present?
+    if entry.respond_to?(:categories) && entry.categories.present?
       tags.concat(entry.categories.map(&:strip))
     end
     

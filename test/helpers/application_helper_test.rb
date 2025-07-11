@@ -85,9 +85,9 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal 'gray', source_type_color('DISCOURSE')
     assert_equal 'gray', source_type_color('GitHub')
     
-    # Source display color is case-sensitive
-    assert_equal 'blue', source_display_color('HuggingFace')
-    assert_equal 'blue', source_display_color('PYTORCH')
+    # Source display color is case-insensitive (uses downcase)
+    assert_equal 'yellow', source_display_color('HuggingFace')
+    assert_equal 'orange', source_display_color('PYTORCH')
   end
 
   test "color methods handle symbols" do
@@ -115,5 +115,32 @@ class ApplicationHelperTest < ActionView::TestCase
     ['huggingface', 'pytorch', 'github', 'rss', 'hackernews', 'unknown'].each do |source|
       assert_includes valid_colors, source_display_color(source)
     end
+  end
+  
+  # Tests for new badge class helpers
+  test "source_display_badge_class returns correct CSS classes" do
+    assert_equal 'bg-yellow-500', source_display_badge_class('huggingface')
+    assert_equal 'bg-orange-500', source_display_badge_class('pytorch')
+    assert_equal 'bg-gray-500', source_display_badge_class('github')
+    assert_equal 'bg-orange-500', source_display_badge_class('reddit')
+    assert_equal 'bg-green-500', source_display_badge_class('rss')
+    assert_equal 'bg-orange-500', source_display_badge_class('hackernews')
+    assert_equal 'bg-blue-500', source_display_badge_class('unknown')
+  end
+  
+  test "source_type_badge_class returns correct CSS classes" do
+    assert_equal 'bg-blue-500', source_type_badge_class('discourse')
+    assert_equal 'bg-gray-500', source_type_badge_class('github')
+    assert_equal 'bg-orange-500', source_type_badge_class('reddit')
+    assert_equal 'bg-green-500', source_type_badge_class('rss')
+    assert_equal 'bg-gray-500', source_type_badge_class('unknown')
+  end
+  
+  test "status_badge_class returns correct CSS classes" do
+    assert_equal 'bg-blue-500', status_badge_class('unread')
+    assert_equal 'bg-green-500', status_badge_class('read')
+    assert_equal 'bg-gray-500', status_badge_class('ignored')
+    assert_equal 'bg-purple-500', status_badge_class('responded')
+    assert_equal 'bg-gray-500', status_badge_class('unknown')
   end
 end

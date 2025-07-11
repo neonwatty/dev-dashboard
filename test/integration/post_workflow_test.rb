@@ -15,23 +15,24 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Developer Dashboard"
     
     # Verify post is displayed
-    assert_select "h2", @post.title
-    assert_select "span", text: "unread"
+    assert_select "h3", @post.title
+    assert_select "span", text: "Unread"
     
     # Filter by source
     get posts_path(source: "huggingface")
     assert_response :success
-    assert_select "h2", @post.title
+    assert_select "h3", @post.title
     
-    # Filter by different source (should not show our post)
+    # Filter by different source (should not show our huggingface post)
     get posts_path(source: "github")
     assert_response :success
-    assert_select "h2", count: 0
+    # Should show github posts from fixtures (github_issue and responded_post)
+    assert_select "h3", count: 2
     
     # Search by keyword
     get posts_path(keyword: @post.title.split.first)
     assert_response :success
-    assert_select "h2", @post.title
+    assert_select "h3", @post.title
     
     # Mark post as read
     patch mark_as_read_post_path(@post)
@@ -45,12 +46,12 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
     # Filter to show only unread posts
     get posts_path(status: "unread")
     assert_response :success
-    assert_select "h2", text: @post.title, count: 0
+    assert_select "h3", text: @post.title, count: 0
     
     # Filter to show read posts
     get posts_path(status: "read")
     assert_response :success
-    assert_select "h2", @post.title
+    assert_select "h3", @post.title
   end
 
   test "workflow: mark multiple posts as read and ignored" do
@@ -100,7 +101,7 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
     
     get posts_path(status: "ignored")
     assert_response :success
-    assert_select "h2", "Test Post 2"
+    assert_select "h3", "Test Post 2"
   end
 
   test "workflow: navigate from posts to sources and back" do
@@ -114,14 +115,14 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
     assert_select "h1", "Sources"
     
     # Verify sources are shown
-    assert_select "h2", @source.name
+    assert_select "a", @source.name
     
     # Click back to posts with specific source filter
-    get posts_path(source: @source.source_type)
+    get posts_path(source: "huggingface")
     assert_response :success
     
-    # Should see posts from that source type
-    assert_select "h2", count: { minimum: 1 }
+    # Should see posts from that source
+    assert_select "h3", minimum: 1
   end
 
   test "workflow: handle invalid post operations gracefully" do
@@ -158,15 +159,15 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
     get posts_path
     assert_response :success
     
-    # Should have pagination controls
-    assert_select "nav[aria-label='Page navigation']"
+    # Should have pagination controls (Kaminari pagination)
+    assert_select ".pagination"
     
     # Navigate to page 2
     get posts_path(page: 2)
     assert_response :success
     
     # Should show different posts
-    assert_select "h2", count: { minimum: 1 }
+    assert_select "h3", minimum: 1
   end
 
   test "workflow: combined filters and search" do
@@ -196,22 +197,22 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
     # Search for "rails" - should find rails post
     get posts_path(keyword: "rails")
     assert_response :success
-    assert_select "h2", "Rails Security Update"
-    assert_select "h2", text: "PyTorch Performance Tips", count: 0
+    assert_select "h3", "Rails Security Update"
+    assert_select "h3", text: "PyTorch Performance Tips", count: 0
     
     # Filter by github source and unread status
     get posts_path(source: "github", status: "unread")
     assert_response :success
-    assert_select "h2", "Rails Security Update"
+    assert_select "h3", "Rails Security Update"
     
     # Filter by read status - should find pytorch post
     get posts_path(status: "read")
     assert_response :success
-    assert_select "h2", "PyTorch Performance Tips"
+    assert_select "h3", "PyTorch Performance Tips"
     
     # Combine keyword and source filter
     get posts_path(keyword: "performance", source: "pytorch")
     assert_response :success
-    assert_select "h2", "PyTorch Performance Tips"
+    assert_select "h3", "PyTorch Performance Tips"
   end
 end

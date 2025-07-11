@@ -64,7 +64,7 @@ class FetchGithubIssuesJobTest < ActiveJob::TestCase
 
     # Verify source status was updated
     @source.reload
-    assert_equal 'ok', @source.status
+    assert_equal 'ok (2 new)', @source.status
     assert_not_nil @source.last_fetched_at
 
     # Verify posts were created correctly

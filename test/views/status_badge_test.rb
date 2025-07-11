@@ -36,7 +36,8 @@ class StatusBadgeTest < ActionView::TestCase
     @source.status = "error: connection failed"
     rendered = render partial: "sources/status_badge", locals: { source: @source }
     
-    assert_match /bg-red-500/, rendered
+    assert_match /bg-red-100/, rendered
+    assert_match /text-red-600/, rendered
     assert_match /Error/, rendered
     assert_match /title=.*connection failed/, rendered
   end

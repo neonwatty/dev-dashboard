@@ -51,7 +51,7 @@ class FetchRssJobTest < ActiveJob::TestCase
     assert_not_nil @source.last_fetched_at
 
     # Verify posts were created correctly
-    post1 = Post.find_by(source: 'rss', title: 'Ruby 3.3 Released with New Features')
+    post1 = Post.find_by(source: @source.name, title: 'Ruby 3.3 Released with New Features')
     assert_not_nil post1
     assert_equal "https://rubyweekly.com/issues/ruby-3-3-released", post1.url
     assert_includes post1.author, "ruby-team"
@@ -61,7 +61,7 @@ class FetchRssJobTest < ActiveJob::TestCase
     assert_equal 'unread', post1.status
     assert post1.priority_score > 0
 
-    post2 = Post.find_by(source: 'rss', title: 'Rails Performance Tips and Tricks')
+    post2 = Post.find_by(source: @source.name, title: 'Rails Performance Tips and Tricks')
     assert_not_nil post2
     assert_includes post2.tags_array, "rails"
     assert_includes post2.tags_array, "tutorial"
@@ -160,7 +160,6 @@ class FetchRssJobTest < ActiveJob::TestCase
     @source.update!(config: '{"keywords": ["ruby", "rails"], "max_items": 20}')
     
     # Mock RSS feed with both matching and non-matching items
-    timestamp = Time.current.to_i
     rss_content = <<~RSS
       <?xml version="1.0" encoding="UTF-8"?>
       <rss version="2.0">
@@ -168,21 +167,21 @@ class FetchRssJobTest < ActiveJob::TestCase
           <title>Mixed Feed</title>
           <item>
             <title>Ruby Programming Tutorial</title>
-            <link>https://example.com/ruby-tutorial-#{timestamp}</link>
+            <link>https://example.com/ruby-tutorial-test</link>
             <description>Learn Ruby programming basics</description>
-            <pubDate>Tue, 09 Jul 2025 12:00:00 +0000</pubDate>
+            <pubDate>#{1.hour.ago.rfc2822}</pubDate>
           </item>
           <item>
             <title>JavaScript Framework Comparison</title>
-            <link>https://example.com/js-comparison-#{timestamp}</link>
+            <link>https://example.com/js-comparison-test</link>
             <description>Comparing different JavaScript frameworks</description>
-            <pubDate>Mon, 08 Jul 2025 12:00:00 +0000</pubDate>
+            <pubDate>#{2.hours.ago.rfc2822}</pubDate>
           </item>
           <item>
             <title>Rails API Development</title>
-            <link>https://example.com/rails-api-#{timestamp}</link>
+            <link>https://example.com/rails-api-test</link>
             <description>Building APIs with Rails framework</description>
-            <pubDate>Sun, 07 Jul 2025 12:00:00 +0000</pubDate>
+            <pubDate>#{3.hours.ago.rfc2822}</pubDate>
           </item>
         </channel>
       </rss>
@@ -197,9 +196,9 @@ class FetchRssJobTest < ActiveJob::TestCase
     end
 
     # Verify only matching posts were created
-    ruby_post = Post.find_by(source: 'rss', title: 'Ruby Programming Tutorial')
-    rails_post = Post.find_by(source: 'rss', title: 'Rails API Development')
-    js_post = Post.find_by(source: 'rss', title: 'JavaScript Framework Comparison')
+    ruby_post = Post.find_by(source: @source.name, title: 'Ruby Programming Tutorial')
+    rails_post = Post.find_by(source: @source.name, title: 'Rails API Development')
+    js_post = Post.find_by(source: @source.name, title: 'JavaScript Framework Comparison')
 
     assert_not_nil ruby_post
     assert_not_nil rails_post
@@ -208,25 +207,28 @@ class FetchRssJobTest < ActiveJob::TestCase
 
   test "should respect max_items configuration" do
     # Configure source with low max_items
-    @source.update!(config: '{"max_items": 1}')
+    # Update config while preserving keywords
+    config = @source.config_hash
+    config['max_items'] = 1
+    @source.update!(config: config.to_json)
     
     # Mock RSS feed with multiple items
-    timestamp = Time.current.to_i
+    # Use fixed URLs to avoid duplicate issues
     rss_content = <<~RSS
       <?xml version="1.0" encoding="UTF-8"?>
       <rss version="2.0">
         <channel>
           <title>Many Items Feed</title>
           <item>
-            <title>First Item</title>
-            <link>https://example.com/first-#{timestamp}</link>
-            <description>First item description</description>
+            <title>First Ruby Item</title>
+            <link>https://example.com/first-test</link>
+            <description>First item about Ruby programming</description>
             <pubDate>Tue, 09 Jul 2025 12:00:00 +0000</pubDate>
           </item>
           <item>
-            <title>Second Item</title>
-            <link>https://example.com/second-#{timestamp}</link>
-            <description>Second item description</description>
+            <title>Second Rails Item</title>
+            <link>https://example.com/second-test</link>
+            <description>Second item about Rails framework</description>
             <pubDate>Mon, 08 Jul 2025 12:00:00 +0000</pubDate>
           </item>
         </channel>
@@ -242,8 +244,8 @@ class FetchRssJobTest < ActiveJob::TestCase
     end
 
     # Should have created the first item only
-    first_post = Post.find_by(source: 'rss', title: 'First Item')
-    second_post = Post.find_by(source: 'rss', title: 'Second Item')
+    first_post = Post.find_by(source: @source.name, title: 'First Ruby Item')
+    second_post = Post.find_by(source: @source.name, title: 'Second Rails Item')
 
     assert_not_nil first_post
     assert_nil second_post
@@ -260,16 +262,16 @@ class FetchRssJobTest < ActiveJob::TestCase
     )
 
     # Mock responses for both sources
-    timestamp = Time.current.to_i
+    # Use fixed URLs to avoid duplicate issues
     rss_content1 = <<~RSS
       <?xml version="1.0" encoding="UTF-8"?>
       <rss version="2.0">
         <channel>
           <title>Feed 1</title>
           <item>
-            <title>RSS Test Item 1</title>
-            <link>https://example.com/test1-#{timestamp}</link>
-            <description>Test item 1</description>
+            <title>Ruby RSS Test Item 1</title>
+            <link>https://example.com/test1-test</link>
+            <description>Test item about Ruby</description>
             <pubDate>Tue, 09 Jul 2025 12:00:00 +0000</pubDate>
           </item>
         </channel>
@@ -283,7 +285,7 @@ class FetchRssJobTest < ActiveJob::TestCase
           <title>Feed 2</title>
           <item>
             <title>RSS Test Item 2</title>
-            <link>https://technews.example.com/test2-#{timestamp}</link>
+            <link>https://technews.example.com/test2-test</link>
             <description>Test item 2</description>
             <pubDate>Tue, 09 Jul 2025 12:00:00 +0000</pubDate>
           </item>
@@ -317,15 +319,15 @@ class FetchRssJobTest < ActiveJob::TestCase
             <pubDate>#{1.hour.ago.rfc2822}</pubDate>
           </item>
           <item>
-            <title>New Framework Release Version 2.0</title>
+            <title>New Rails Framework Release Version 2.0</title>
             <link>https://example.com/release</link>
-            <description>Announcing the release of Framework 2.0 with new features</description>
+            <description>Announcing the release of Rails Framework 2.0 with new features</description>
             <pubDate>#{2.hours.ago.rfc2822}</pubDate>
           </item>
           <item>
-            <title>Random Blog Post</title>
+            <title>Random Ruby Blog Post</title>
             <link>https://example.com/random</link>
-            <description>Just a short post</description>
+            <description>Just a short post about Ruby</description>
             <pubDate>#{1.week.ago.rfc2822}</pubDate>
           </item>
         </channel>
@@ -337,9 +339,9 @@ class FetchRssJobTest < ActiveJob::TestCase
 
     FetchRssJob.perform_now(@source.id)
 
-    tutorial_post = Post.find_by(source: 'rss', title: 'Ruby Tutorial: Complete Guide for Developers')
-    release_post = Post.find_by(source: 'rss', title: 'New Framework Release Version 2.0')
-    random_post = Post.find_by(source: 'rss', title: 'Random Blog Post')
+    tutorial_post = Post.find_by(source: @source.name, title: 'Ruby Tutorial: Complete Guide for Developers')
+    release_post = Post.find_by(source: @source.name, title: 'New Rails Framework Release Version 2.0')
+    random_post = Post.find_by(source: @source.name, title: 'Random Ruby Blog Post')
 
     assert_not_nil tutorial_post
     assert_not_nil release_post
@@ -364,7 +366,7 @@ class FetchRssJobTest < ActiveJob::TestCase
         <channel>
           <title>Minimal Feed</title>
           <item>
-            <title>Minimal RSS Item</title>
+            <title>Minimal Ruby RSS Item</title>
             <link>https://example.com/minimal-#{Time.current.to_i}</link>
             <!-- Missing: description, author, pubDate, categories -->
           </item>
@@ -379,7 +381,7 @@ class FetchRssJobTest < ActiveJob::TestCase
       FetchRssJob.perform_now(@source.id)
     end
 
-    post = Post.find_by(source: 'rss', title: 'Minimal RSS Item')
+    post = Post.find_by(source: @source.name, title: 'Minimal Ruby RSS Item')
     assert_not_nil post
     assert_includes post.url, "https://example.com/minimal"
     assert_equal "Unknown", post.author

@@ -46,6 +46,9 @@ class TurboFormsTest < ActionDispatch::IntegrationTest
   end
 
   test "delete button should work from sources index" do
+    # Remove any posts associated with this source to allow deletion
+    Post.where(source: "huggingface").delete_all
+    
     assert_difference("Source.count", -1) do
       delete source_path(@source)
     end

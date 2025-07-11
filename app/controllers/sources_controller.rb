@@ -73,8 +73,15 @@ class SourcesController < ApplicationController
   end
 
   def destroy
-    @source.destroy
-    redirect_to sources_url, notice: 'Source was successfully deleted.'
+    # Check if there are any posts from this source
+    posts_count = Post.where(source: source_string_for(@source)).count
+    
+    if posts_count > 0
+      redirect_to sources_url, alert: "Cannot delete source with #{posts_count} associated posts."
+    else
+      @source.destroy
+      redirect_to sources_url, notice: 'Source was successfully deleted.'
+    end
   end
   
   def refresh
@@ -148,5 +155,30 @@ class SourcesController < ApplicationController
 
   def source_params
     params.require(:source).permit(:name, :source_type, :url, :config, :active)
+  end
+  
+  def source_string_for(source)
+    case source.source_type
+    when 'discourse'
+      if source.url.include?('huggingface.co')
+        'huggingface'
+      elsif source.url.include?('pytorch.org')
+        'pytorch'
+      else
+        'discourse'
+      end
+    when 'github'
+      'github'
+    when 'reddit'
+      'reddit'
+    when 'rss'
+      if source.url.include?('news.ycombinator.com') || source.name.downcase.include?('hacker news')
+        'hackernews'
+      else
+        'rss'
+      end
+    else
+      source.source_type
+    end
   end
 end

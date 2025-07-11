@@ -30,6 +30,7 @@ module ApplicationHelper
   end
 
   def source_display_color(source_name)
+    return 'blue' if source_name.nil? || source_name.empty?
     case source_name.downcase
     when 'huggingface'
       'yellow'
