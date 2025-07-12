@@ -6,7 +6,7 @@ class FetchPytorchJob < ApplicationJob
       source = Source.find(source_id)
       fetch_from_source(source)
     else
-      Source.active.discourse.each do |source|
+      Source.active.auto_fetch_enabled.discourse.each do |source|
         fetch_from_source(source) if source.url.include?('pytorch.org')
       end
     end
@@ -16,6 +16,7 @@ class FetchPytorchJob < ApplicationJob
 
   def fetch_from_source(source)
     return unless source.url.include?('pytorch.org')
+    return unless source.auto_fetch_enabled?
 
     begin
       service = DiscourseService.new(source)
@@ -32,6 +33,9 @@ class FetchPytorchJob < ApplicationJob
       status_message = new_posts_count > 0 ? "ok (#{new_posts_count} new)" : "ok"
       Rails.logger.info "Broadcasting status for #{source.name}: #{status_message}"
       source.update_status_and_broadcast(status_message)
+      
+      # Broadcast recent posts update if new posts were created
+      source.broadcast_recent_posts_update if new_posts_count > 0
     rescue => e
       Rails.logger.error "Error fetching from #{source.name}: #{e.message}"
       Rails.logger.error "Full error: #{e.inspect}"

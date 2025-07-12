@@ -43,3 +43,7 @@ node_modules
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# VCR cassettes contain real API responses
+/test/vcr_cassettes/*
+!/test/vcr_cassettes/.keep

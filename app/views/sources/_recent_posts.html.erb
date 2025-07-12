@@ -1,0 +1,17 @@
+<% recent_posts = Post.where(source: source_identifier_for(source)).order(posted_at: :desc).limit(10) %>
+<% if recent_posts.any? %>
+  <div class="space-y-4">
+    <% recent_posts.each do |post| %>
+      <div class="border-l-4 border-blue-500 pl-4">
+        <h3 class="font-medium text-gray-900">
+          <%= link_to post.title, post.url, target: "_blank", class: "hover:text-blue-600" %>
+        </h3>
+        <p class="text-sm text-gray-500">
+          by <%= post.author %> • <%= time_ago_in_words(post.posted_at) %> ago
+        </p>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p class="text-gray-500">No posts have been fetched from this source yet.</p>
+<% end %>

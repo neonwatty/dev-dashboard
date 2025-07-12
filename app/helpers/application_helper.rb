@@ -96,4 +96,29 @@ module ApplicationHelper
       'bg-gray-500'
     end
   end
+  
+  def source_identifier_for(source)
+    case source.source_type
+    when 'discourse'
+      if source.url.include?('huggingface.co')
+        'huggingface'
+      elsif source.url.include?('pytorch.org')
+        'pytorch'
+      else
+        'discourse'
+      end
+    when 'github'
+      'github'
+    when 'reddit'
+      'reddit'
+    when 'rss'
+      if source.url.include?('news.ycombinator.com') || (source.name&.downcase&.include?('hacker news'))
+        'hackernews'
+      else
+        'rss'
+      end
+    else
+      source.source_type
+    end
+  end
 end

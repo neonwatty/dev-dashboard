@@ -5,6 +5,9 @@ require "webmock/minitest"
 require "vcr"
 require "timecop"
 
+# Load support files
+Dir[Rails.root.join("test/support/**/*.rb")].each { |f| require f }
+
 # Configure WebMock
 WebMock.disable_net_connect!(allow_localhost: true)
 
@@ -12,7 +15,23 @@ WebMock.disable_net_connect!(allow_localhost: true)
 VCR.configure do |config|
   config.cassette_library_dir = "test/vcr_cassettes"
   config.hook_into :webmock
-  config.default_cassette_options = { record: :new_episodes }
+  config.default_cassette_options = { 
+    record: :new_episodes,
+    match_requests_on: [:method, :uri, :query],
+    allow_unused_http_interactions: false
+  }
+  
+  # Filter sensitive data
+  config.filter_sensitive_data('<DISCOURSE_API_KEY>') { ENV['DISCOURSE_API_KEY'] }
+  config.filter_sensitive_data('<GITHUB_TOKEN>') { ENV['GITHUB_TOKEN'] }
+  config.filter_sensitive_data('<REDDIT_CLIENT_ID>') { ENV['REDDIT_CLIENT_ID'] }
+  config.filter_sensitive_data('<REDDIT_CLIENT_SECRET>') { ENV['REDDIT_CLIENT_SECRET'] }
+  
+  # Ignore localhost requests (for system tests)
+  config.ignore_localhost = true
+  
+  # Allow real HTTP connections when no cassette is in use (for debugging)
+  # config.allow_http_connections_when_no_cassette = true
 end
 
 module ActiveSupport

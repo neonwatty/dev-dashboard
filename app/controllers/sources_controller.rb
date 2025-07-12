@@ -8,7 +8,7 @@ class SourcesController < ApplicationController
   end
   
   def refresh_all
-    active_sources = Source.active
+    active_sources = Source.active.auto_fetch_enabled
     job_count = 0
     
     active_sources.each do |source|
@@ -154,7 +154,7 @@ class SourcesController < ApplicationController
   end
 
   def source_params
-    params.require(:source).permit(:name, :source_type, :url, :config, :active)
+    params.require(:source).permit(:name, :source_type, :url, :config, :active, :auto_fetch_enabled)
   end
   
   def source_string_for(source)

@@ -9,6 +9,7 @@ class Source < ApplicationRecord
   validates :active, inclusion: { in: [true, false] }
   
   scope :active, -> { where(active: true) }
+  scope :auto_fetch_enabled, -> { where(auto_fetch_enabled: true) }
   scope :by_type, ->(type) { where(source_type: type) }
   
   def config_hash
@@ -59,5 +60,15 @@ class Source < ApplicationRecord
   def update_status_and_broadcast(new_status)
     update!(status: new_status)
     broadcast_status_update
+  end
+  
+  def broadcast_recent_posts_update
+    # Broadcast to the source-specific channel (for show page)
+    broadcast_replace_to(
+      "source_status:#{id}",
+      target: "source_#{id}_recent_posts",
+      partial: "sources/recent_posts",
+      locals: { source: self }
+    )
   end
 end

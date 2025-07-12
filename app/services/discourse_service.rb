@@ -213,4 +213,14 @@ class DiscourseService
       end
     end
   end
+
+  def determine_source_identifier
+    if @source.url.include?('huggingface.co')
+      'huggingface'
+    elsif @source.url.include?('pytorch.org')
+      'pytorch'
+    else
+      'discourse'
+    end
+  end
 end

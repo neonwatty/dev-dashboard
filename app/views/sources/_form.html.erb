@@ -192,10 +192,18 @@
     </div>
   </div>
 
-  <div class="flex items-center">
-    <%= form.check_box :active, class: "mr-2" %>
-    <%= form.label :active, "Active", class: "text-sm font-medium text-gray-700" %>
-    <p class="text-sm text-gray-500 ml-2">Active sources are included in scheduled fetches</p>
+  <div class="space-y-3">
+    <div class="flex items-center">
+      <%= form.check_box :active, class: "mr-2" %>
+      <%= form.label :active, "Active", class: "text-sm font-medium text-gray-700" %>
+      <p class="text-sm text-gray-500 ml-2">Active sources are included in scheduled fetches</p>
+    </div>
+    
+    <div class="flex items-center">
+      <%= form.check_box :auto_fetch_enabled, class: "mr-2" %>
+      <%= form.label :auto_fetch_enabled, "Auto-fetch latest posts", class: "text-sm font-medium text-gray-700" %>
+      <p class="text-sm text-gray-500 ml-2">Automatically fetch new posts from this source during scheduled runs</p>
+    </div>
   </div>
 
   <div class="flex justify-end space-x-4">
