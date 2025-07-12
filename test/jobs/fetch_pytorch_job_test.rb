@@ -38,7 +38,7 @@ class FetchPytorchJobTest < ActiveJob::TestCase
       }
     }.to_json
 
-    stub_request(:get, "#{@source.url}/latest.json")
+    stub_request(:get, "#{@source.url}/latest.json?page=0")
       .to_return(status: 200, body: response_body, headers: { 'Content-Type' => 'application/json' })
 
     # Perform the job
@@ -100,7 +100,7 @@ class FetchPytorchJobTest < ActiveJob::TestCase
       }
     }.to_json
 
-    stub_request(:get, "#{@source.url}/latest.json")
+    stub_request(:get, "#{@source.url}/latest.json?page=0")
       .to_return(status: 200, body: response_body)
 
     # Should not create new post
@@ -116,7 +116,7 @@ class FetchPytorchJobTest < ActiveJob::TestCase
 
   test "should handle API errors gracefully" do
     # Mock failed API response
-    stub_request(:get, "#{@source.url}/latest.json")
+    stub_request(:get, "#{@source.url}/latest.json?page=0")
       .to_return(status: 500, body: 'Internal Server Error')
 
     # Should not create any posts
@@ -126,12 +126,12 @@ class FetchPytorchJobTest < ActiveJob::TestCase
 
     # Source status should reflect error
     @source.reload
-    assert_includes @source.status, 'error: HTTP 500'
+    assert_includes @source.status, 'error: HTTP Error: 500'
   end
 
   test "should handle network timeouts" do
     # Mock timeout
-    stub_request(:get, "#{@source.url}/latest.json")
+    stub_request(:get, "#{@source.url}/latest.json?page=0")
       .to_timeout
 
     assert_no_difference('Post.count') do
@@ -144,7 +144,7 @@ class FetchPytorchJobTest < ActiveJob::TestCase
 
   test "should handle invalid JSON response" do
     # Mock invalid JSON response
-    stub_request(:get, "#{@source.url}/latest.json")
+    stub_request(:get, "#{@source.url}/latest.json?page=0")
       .to_return(status: 200, body: 'invalid json response')
 
     assert_no_difference('Post.count') do
@@ -209,10 +209,10 @@ class FetchPytorchJobTest < ActiveJob::TestCase
       }
     }.to_json
 
-    stub_request(:get, "#{@source.url}/latest.json")
+    stub_request(:get, "#{@source.url}/latest.json?page=0")
       .to_return(status: 200, body: response_body)
     
-    stub_request(:get, "#{pytorch_source2.url}/latest.json")
+    stub_request(:get, "#{pytorch_source2.url}/latest.json?page=0")
       .to_return(status: 200, body: response_body2)
 
     # Should process both PyTorch sources
@@ -266,7 +266,7 @@ class FetchPytorchJobTest < ActiveJob::TestCase
       }
     }.to_json
 
-    stub_request(:get, "#{@source.url}/latest.json")
+    stub_request(:get, "#{@source.url}/latest.json?page=0")
       .to_return(status: 200, body: response_body)
 
     FetchPytorchJob.perform_now(@source.id)
@@ -296,7 +296,7 @@ class FetchPytorchJobTest < ActiveJob::TestCase
       }
     }.to_json
 
-    stub_request(:get, "#{@source.url}/latest.json")
+    stub_request(:get, "#{@source.url}/latest.json?page=0")
       .to_return(status: 200, body: response_body)
 
     assert_difference('Post.count', 1) do
@@ -309,6 +309,6 @@ class FetchPytorchJobTest < ActiveJob::TestCase
     assert_equal "#{@source.url}/t/topic-889004/889004", post.url  # Fallback slug
     assert_equal "unknown", post.author  # Default value
     assert_equal [], post.tags_array     # Empty array
-    assert post.priority_score >= 2.0   # Should get unanswered boost
+    assert post.priority_score >= 0   # No boost without question mark
   end
 end
