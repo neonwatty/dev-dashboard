@@ -1,0 +1,207 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <!-- Header Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-6 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+      <div class="mb-4 md:mb-0">
+        <h1 class="text-3xl font-bold text-white">Developer Dashboard</h1>
+        <p class="text-blue-100 mt-2">Discover opportunities to contribute to the developer community</p>
+      </div>
+      <% if authenticated? %>
+        <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
+          <%= link_to new_source_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add Source
+          <% end %>
+          <%= button_to refresh_all_sources_path, 
+                     method: :post,
+                     data: { turbo_confirm: "This will refresh all active sources. Continue?", disable_with: "Refreshing..." },
+                     class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors" do %>
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Refresh All
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Total Posts</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= Post.count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Unread</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= Post.where(status: 'unread').count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Responded</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= Post.where(status: 'responded').count %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Active Sources</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= Source.active.count %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <%= form_with url: posts_path, method: :get, local: true, class: "space-y-4" do |form| %>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div>
+          <%= form.text_field :keyword, placeholder: "Search keywords...", 
+                             value: params[:keyword], 
+                             class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        </div>
+        
+        <div>
+          <%= form.select :source, options_for_select([['All Sources', '']] + @sources.map { |s| [s.titleize, s] }, params[:source]), 
+                         {}, 
+                         { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+        
+        <div>
+          <%= form.select :subreddit, options_for_select([['All Subreddits', '']] + @subreddits.map { |s| ["r/#{s}", s] }, params[:subreddit]), 
+                         {}, 
+                         { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+        
+        <div>
+          <%= form.select :status, options_for_select([['All Status', ''], ['Unread', 'unread'], ['Read', 'read'], ['Ignored', 'ignored'], ['Responded', 'responded']], params[:status]), 
+                         {}, 
+                         { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+        
+        <div>
+          <%= form.select :sort, options_for_select([['Most Recent', 'recent'], ['Highest Priority', 'priority']], params[:sort] || 'recent'), 
+                         {}, 
+                         { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+      </div>
+      
+      <div class="flex space-x-4">
+        <%= form.submit "Filter", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
+        <%= link_to "Clear", posts_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Posts List -->
+  <div class="space-y-4">
+    <% @posts.each do |post| %>
+      <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="flex items-center space-x-2 mb-2">
+              <span class="inline-block px-2 py-1 text-xs font-semibold text-white <%= source_display_badge_class(post.source) %> rounded">
+                <%= post.source.titleize %>
+              </span>
+              <span class="text-gray-500 text-sm">by <%= post.author %></span>
+              <span class="text-gray-500 text-sm">• <%= time_ago_in_words(post.posted_at) %> ago</span>
+              <% if post.priority_score && post.priority_score > 0 %>
+                <span class="inline-block px-2 py-1 text-xs font-semibold text-white bg-red-500 rounded">
+                  Priority: <%= post.priority_score.round(1) %>
+                </span>
+              <% end %>
+            </div>
+            
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">
+              <%= link_to post.title, post.url, target: "_blank", class: "hover:text-blue-600" %>
+            </h3>
+            
+            <% if post.summary.present? %>
+              <p class="text-gray-600 mb-3"><%= truncate(post.summary, length: 200) %></p>
+            <% end %>
+            
+            <% if post.tags_array.any? %>
+              <div class="flex flex-wrap gap-2 mb-3">
+                <% post.tags_array.each do |tag| %>
+                  <span class="inline-block px-2 py-1 text-xs font-semibold text-gray-700 bg-gray-200 rounded">
+                    <%= tag %>
+                  </span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          
+          <div class="flex flex-col space-y-2 ml-4">
+            <span class="inline-block px-2 py-1 text-xs font-semibold text-white <%= status_badge_class(post.status) %> rounded">
+              <%= post.status.titleize %>
+            </span>
+            
+            <% if authenticated? %>
+              <div class="flex flex-col space-y-1">
+                <%= button_to "Read", mark_as_read_post_path(post), 
+                           method: :patch,
+                           class: "text-xs bg-green-500 hover:bg-green-600 text-white font-medium py-1 px-2 rounded transition-colors w-full" %>
+                <%= button_to "Ignore", mark_as_ignored_post_path(post), 
+                           method: :patch,
+                           class: "text-xs bg-gray-500 hover:bg-gray-600 text-white font-medium py-1 px-2 rounded transition-colors w-full" %>
+                <%= button_to "Responded", mark_as_responded_post_path(post), 
+                           method: :patch,
+                           class: "text-xs bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-2 rounded transition-colors w-full" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Pagination -->
+  <div class="mt-8 flex justify-center">
+    <div class="bg-white rounded-lg shadow-sm">
+      <%= paginate @posts %>
+    </div>
+  </div>
+</div>
+
+<script>
+  function refreshAll() {
+    // This would trigger refresh for all active sources
+    alert('Refresh functionality will be implemented with AJAX');
+  }
+</script>
