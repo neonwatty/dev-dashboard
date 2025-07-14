@@ -1,0 +1,395 @@
+<%= form_with(model: source, local: true, class: "space-y-6") do |form| %>
+  <% if source.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <h4 class="font-bold">Please fix the following errors:</h4>
+      <ul class="list-disc list-inside">
+        <% source.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :name, 
+                         placeholder: "e.g., HuggingFace Forum",
+                         class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+    </div>
+
+    <div>
+      <%= form.label :source_type, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.select :source_type, 
+                     options_for_select([
+                       ['Discourse Forum', 'discourse'],
+                       ['GitHub Repository', 'github'],
+                       ['GitHub Trending', 'github_trending'],
+                       ['Reddit Subreddit', 'reddit'],
+                       ['RSS Feed', 'rss']
+                     ], source.source_type), 
+                     {},
+                     { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                       data: { action: "change->source-form#toggleFields" } } %>
+    </div>
+  </div>
+
+  <div id="url-field">
+    <%= form.label :url, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.url_field :url, 
+                      placeholder: "https://discuss.huggingface.co",
+                      class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+    <p class="text-sm text-gray-500 mt-1">Base URL for the source (without /latest.json or other paths)</p>
+  </div>
+
+  <!-- Discourse-specific fields -->
+  <div id="discourse-fields" class="space-y-4 <%= source.source_type == 'discourse' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">Discourse Configuration</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= label_tag "discourse_api_key", "API Key (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= text_field_tag "discourse_api_key", 
+                          source.config_hash['api_key'],
+                          placeholder: "Leave blank for public forums",
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <p class="text-sm text-gray-500 mt-1">Required only for private forums or to avoid rate limits</p>
+      </div>
+
+      <div>
+        <%= label_tag "discourse_api_username", "API Username", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= text_field_tag "discourse_api_username", 
+                          source.config_hash['api_username'] || 'system',
+                          placeholder: "system",
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-6">
+      <div class="flex items-center">
+        <%= check_box_tag "discourse_fetch_full_content", 
+                         "1", 
+                         source.config_hash['fetch_full_content'] == true,
+                         class: "mr-2" %>
+        <%= label_tag "discourse_fetch_full_content", "Fetch full post content", class: "text-sm font-medium text-gray-700" %>
+      </div>
+
+      <div class="flex items-center">
+        <%= check_box_tag "discourse_include_category_as_tag", 
+                         "1", 
+                         source.config_hash['include_category_as_tag'] == true,
+                         class: "mr-2" %>
+        <%= label_tag "discourse_include_category_as_tag", "Include category as tag", class: "text-sm font-medium text-gray-700" %>
+      </div>
+    </div>
+
+    <div>
+      <%= label_tag "discourse_priority_tags", "Priority Tags (comma-separated)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= text_field_tag "discourse_priority_tags", 
+                        source.config_hash['priority_tags']&.join(', '),
+                        placeholder: "bug, help-wanted, urgent",
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-sm text-gray-500 mt-1">Posts with these tags will get higher priority scores</p>
+    </div>
+  </div>
+
+  <!-- GitHub-specific fields -->
+  <div id="github-fields" class="space-y-4 <%= source.source_type == 'github' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">GitHub Configuration</h3>
+    
+    <div>
+      <%= label_tag "github_token", "Personal Access Token", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= text_field_tag "github_token", 
+                        source.config_hash['token'],
+                        placeholder: "ghp_...",
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-sm text-gray-500 mt-1">Required for private repos and higher rate limits</p>
+    </div>
+
+    <div>
+      <%= label_tag "github_labels", "Filter by Labels (comma-separated)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= text_field_tag "github_labels", 
+                        source.config_hash['labels']&.join(', '),
+                        placeholder: "bug, enhancement, help-wanted",
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+    </div>
+  </div>
+
+  <!-- Reddit-specific fields -->
+  <div id="reddit-fields" class="space-y-4 <%= source.source_type == 'reddit' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">Reddit Configuration</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= label_tag "reddit_sort", "Sort By", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= select_tag "reddit_sort", 
+                      options_for_select([
+                        ['Hot', 'hot'],
+                        ['New', 'new'],
+                        ['Rising', 'rising'],
+                        ['Top', 'top']
+                      ], source.config_hash['sort'] || 'hot'),
+                      class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <div>
+        <%= label_tag "reddit_limit", "Post Limit", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= number_field_tag "reddit_limit", 
+                           source.config_hash['limit'] || 25,
+                           min: 1,
+                           max: 100,
+                           class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+    </div>
+
+    <div>
+      <%= label_tag "reddit_keywords", "Filter Keywords (comma-separated)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= text_field_tag "reddit_keywords", 
+                        source.config_hash['keywords']&.join(', '),
+                        placeholder: "python, machine learning, AI",
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+    </div>
+  </div>
+
+  <!-- RSS-specific fields -->
+  <div id="rss-fields" class="space-y-4 <%= source.source_type == 'rss' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">RSS Configuration</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= label_tag "rss_keywords", "Filter Keywords (comma-separated)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= text_field_tag "rss_keywords", 
+                          source.config_hash['keywords']&.join(', '),
+                          placeholder: "ruby, rails, programming",
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <div>
+        <%= label_tag "rss_max_items", "Max Items to Fetch", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= number_field_tag "rss_max_items", 
+                           source.config_hash['max_items'] || 20,
+                           min: 1,
+                           max: 100,
+                           class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- GitHub Trending-specific fields -->
+  <div id="github_trending-fields" class="space-y-4 <%= source.source_type == 'github_trending' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">GitHub Trending Configuration</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= label_tag "github_trending_token", "GitHub Token (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= text_field_tag "github_trending_token", 
+                          source.config_hash['token'],
+                          placeholder: "ghp_...",
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <p class="text-sm text-gray-500 mt-1">Improves rate limits and access to more data</p>
+      </div>
+
+      <div>
+        <%= label_tag "github_trending_since", "Time Period", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= select_tag "github_trending_since", 
+                      options_for_select([
+                        ['Daily', 'daily'],
+                        ['Weekly', 'weekly'],
+                        ['Monthly', 'monthly']
+                      ], source.config_hash['since'] || 'daily'),
+                      class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= label_tag "github_trending_language", "Language Filter", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= text_field_tag "github_trending_language", 
+                          source.config_hash['language'],
+                          placeholder: "JavaScript, Python, Ruby...",
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <p class="text-sm text-gray-500 mt-1">Leave blank for all languages</p>
+      </div>
+
+      <div>
+        <%= label_tag "github_trending_preferred_languages", "Preferred Languages (comma-separated)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= text_field_tag "github_trending_preferred_languages", 
+                          source.config_hash['preferred_languages']&.join(', '),
+                          placeholder: "Python, JavaScript, Go",
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <p class="text-sm text-gray-500 mt-1">Repositories in these languages get higher priority scores</p>
+      </div>
+    </div>
+    
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+      <div class="flex items-center">
+        <%= check_box_tag "github_trending_use_scraper", 
+                         "1", 
+                         source.config_hash['use_scraper'] == true,
+                         class: "mr-2" %>
+        <%= label_tag "github_trending_use_scraper", "Use exact GitHub trending (scraper)", class: "text-sm font-medium text-gray-700" %>
+      </div>
+      <p class="text-sm text-gray-600 mt-2">
+        <strong>Checked:</strong> Get exact GitHub trending data (matches github.com/trending)<br>
+        <strong>Unchecked:</strong> Use GitHub API approximation (respects rate limits)
+      </p>
+      <p class="text-xs text-yellow-800 mt-2">
+        ⚠️ Scraping may be against GitHub's Terms of Service. Use responsibly.
+      </p>
+    </div>
+  </div>
+
+  <!-- Raw JSON config (hidden by default) -->
+  <div class="mt-6">
+    <div class="flex items-center mb-2">
+      <%= label_tag "show_raw_config", class: "text-sm font-medium text-gray-700 cursor-pointer" do %>
+        <%= check_box_tag "show_raw_config", "1", false, 
+                         data: { action: "change->source-form#toggleRawConfig" } %>
+        <span class="ml-2">Show raw JSON configuration</span>
+      <% end %>
+    </div>
+    
+    <div id="raw-config" class="hidden">
+      <%= form.label :config, "Raw Configuration (JSON)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :config, 
+                        rows: 4,
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" %>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    <div class="flex items-center">
+      <%= form.check_box :active, class: "mr-2" %>
+      <%= form.label :active, "Active", class: "text-sm font-medium text-gray-700" %>
+      <p class="text-sm text-gray-500 ml-2">Active sources are included in scheduled fetches</p>
+    </div>
+    
+    <div class="flex items-center">
+      <%= form.check_box :auto_fetch_enabled, class: "mr-2" %>
+      <%= form.label :auto_fetch_enabled, "Auto-fetch latest posts", class: "text-sm font-medium text-gray-700" %>
+      <p class="text-sm text-gray-500 ml-2">Automatically fetch new posts from this source during scheduled runs</p>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-4">
+    <%= link_to "Cancel", source.persisted? ? source : sources_path, 
+               class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
+    <%= form.submit source.persisted? ? "Update Source" : "Create Source", 
+                   class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+  </div>
+<% end %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to toggle field visibility based on source type
+  function toggleFields() {
+    const sourceType = document.querySelector('#source_source_type').value;
+    const fieldGroups = ['discourse', 'github', 'reddit', 'rss', 'github_trending'];
+    
+    fieldGroups.forEach(function(type) {
+      const fields = document.getElementById(type + '-fields');
+      if (fields) {
+        fields.classList.toggle('hidden', sourceType !== type);
+      }
+    });
+    
+    // Hide URL field for GitHub Trending since it doesn't need one
+    const urlField = document.getElementById('url-field');
+    if (urlField) {
+      urlField.classList.toggle('hidden', sourceType === 'github_trending');
+    }
+  }
+  
+  // Function to toggle raw config visibility
+  function toggleRawConfig() {
+    const showRaw = document.getElementById('show_raw_config').checked;
+    const rawConfig = document.getElementById('raw-config');
+    if (rawConfig) {
+      rawConfig.classList.toggle('hidden', !showRaw);
+    }
+  }
+  
+  // Attach event listeners
+  const sourceTypeSelect = document.querySelector('#source_source_type');
+  if (sourceTypeSelect) {
+    sourceTypeSelect.addEventListener('change', toggleFields);
+  }
+  
+  const showRawCheckbox = document.getElementById('show_raw_config');
+  if (showRawCheckbox) {
+    showRawCheckbox.addEventListener('change', toggleRawConfig);
+  }
+  
+  // Initial toggle
+  toggleFields();
+  
+  // Update JSON config before form submission
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const sourceType = document.querySelector('#source_source_type').value;
+      const config = {};
+      
+      // Collect configuration based on source type
+      if (sourceType === 'discourse') {
+        const apiKey = document.getElementById('discourse_api_key').value;
+        if (apiKey) config.api_key = apiKey;
+        
+        const apiUsername = document.getElementById('discourse_api_username').value;
+        if (apiUsername) config.api_username = apiUsername;
+        
+        config.fetch_full_content = document.getElementById('discourse_fetch_full_content').checked;
+        config.include_category_as_tag = document.getElementById('discourse_include_category_as_tag').checked;
+        
+        const priorityTags = document.getElementById('discourse_priority_tags').value;
+        if (priorityTags) {
+          config.priority_tags = priorityTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+        }
+      } else if (sourceType === 'github') {
+        const token = document.getElementById('github_token').value;
+        if (token) config.token = token;
+        
+        const labels = document.getElementById('github_labels').value;
+        if (labels) {
+          config.labels = labels.split(',').map(label => label.trim()).filter(label => label);
+        }
+      } else if (sourceType === 'reddit') {
+        config.sort = document.getElementById('reddit_sort').value;
+        config.limit = parseInt(document.getElementById('reddit_limit').value);
+        
+        const keywords = document.getElementById('reddit_keywords').value;
+        if (keywords) {
+          config.keywords = keywords.split(',').map(kw => kw.trim()).filter(kw => kw);
+        }
+      } else if (sourceType === 'rss') {
+        const keywords = document.getElementById('rss_keywords').value;
+        if (keywords) {
+          config.keywords = keywords.split(',').map(kw => kw.trim()).filter(kw => kw);
+        }
+        
+        config.max_items = parseInt(document.getElementById('rss_max_items').value);
+      } else if (sourceType === 'github_trending') {
+        const token = document.getElementById('github_trending_token').value;
+        if (token) config.token = token;
+        
+        config.since = document.getElementById('github_trending_since').value;
+        
+        const language = document.getElementById('github_trending_language').value;
+        if (language) config.language = language;
+        
+        const preferredLanguages = document.getElementById('github_trending_preferred_languages').value;
+        if (preferredLanguages) {
+          config.preferred_languages = preferredLanguages.split(',').map(lang => lang.trim()).filter(lang => lang);
+        }
+        
+        config.use_scraper = document.getElementById('github_trending_use_scraper').checked;
+      }
+      
+      // Update the hidden config field unless raw mode is active
+      if (!document.getElementById('show_raw_config').checked) {
+        document.getElementById('source_config').value = JSON.stringify(config, null, 2);
+      }
+    });
+  }
+});
+</script>

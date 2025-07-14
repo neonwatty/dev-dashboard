@@ -1,0 +1,13 @@
+<%# Update the status badge %>
+<%= turbo_stream.replace "#{dom_id(@post)}_status" do %>
+  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800" 
+        data-status-badge
+        id="<%= dom_id(@post) %>_status">
+    Responded
+  </span>
+<% end %>
+
+<%# Re-render the card to update buttons %>
+<%= turbo_stream.update "#{dom_id(@post)}_card" do %>
+  <%= render 'posts/post_card', post: @post %>
+<% end %>

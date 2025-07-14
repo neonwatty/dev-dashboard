@@ -1,0 +1,175 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+    <p class="text-gray-600 mt-2">Track your developer community engagement and activity</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Total Posts</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= @total_posts %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Unread</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= @unread_posts %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Responded</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= @responded_posts %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-gray-500">Active Sources</p>
+          <p class="text-2xl font-semibold text-gray-900"><%= @active_sources %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Metrics Row -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Response Rate</h3>
+      <p class="text-3xl font-bold text-green-600"><%= @response_rate %>%</p>
+      <p class="text-sm text-gray-500 mt-1">of non-ignored posts responded to</p>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Recent Activity</h3>
+      <p class="text-3xl font-bold text-blue-600"><%= @recent_posts %></p>
+      <p class="text-sm text-gray-500 mt-1">posts in the last 7 days</p>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">Daily Average</h3>
+      <p class="text-3xl font-bold text-purple-600"><%= @avg_posts_per_day %></p>
+      <p class="text-sm text-gray-500 mt-1">posts per day (30-day average)</p>
+    </div>
+  </div>
+
+  <!-- Posts by Source -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Posts by Source</h3>
+      <% if @posts_by_source.any? %>
+        <div class="space-y-3">
+          <% @posts_by_source.first(10).each do |source, count| %>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <div class="w-4 h-4 rounded <%= source_icon_bg_class(source) %>"></div>
+                <span class="text-sm font-medium text-gray-700"><%= source || 'Unknown' %></span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600"><%= count %> posts</span>
+                <% percentage = (count.to_f / @total_posts * 100).round(1) %>
+                <span class="text-xs text-gray-500">(<%= percentage %>%)</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-500">No posts yet</p>
+      <% end %>
+    </div>
+
+    <!-- Posts by Status -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Posts by Status</h3>
+      <% if @posts_by_status.any? %>
+        <div class="space-y-3">
+          <% status_colors = { 
+               'unread' => 'bg-gray-200 text-gray-800',
+               'read' => 'bg-blue-100 text-blue-800',
+               'responded' => 'bg-green-100 text-green-800',
+               'ignored' => 'bg-yellow-100 text-yellow-800'
+             } %>
+          <% @posts_by_status.each do |status, count| %>
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= status_colors[status] || 'bg-gray-100 text-gray-800' %>">
+                <%= status&.humanize || 'Unknown' %>
+              </span>
+              <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600"><%= count %> posts</span>
+                <% percentage = (count.to_f / @total_posts * 100).round(1) %>
+                <span class="text-xs text-gray-500">(<%= percentage %>%)</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-500">No posts yet</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Top Tags -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Tags</h3>
+    <% if @top_tags.any? %>
+      <div class="flex flex-wrap gap-2">
+        <% @top_tags.each do |tag, count| %>
+          <%= link_to posts_path(tag: tag), class: "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors" do %>
+            <%= tag %>
+            <span class="ml-1 text-xs">(<%= count %>)</span>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500">No tags found</p>
+    <% end %>
+  </div>
+
+  <!-- Activity Chart Placeholder -->
+  <div class="bg-white rounded-lg shadow-md p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Activity Over Time</h3>
+    <div class="bg-gray-50 rounded-lg p-8 text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      </svg>
+      <p class="mt-2 text-sm text-gray-500">
+        Activity chart showing <%= @posts_over_time.count %> days of data
+      </p>
+      <p class="text-xs text-gray-400 mt-1">
+        (Chart visualization can be added with a charting library)
+      </p>
+    </div>
+  </div>
+</div>
