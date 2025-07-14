@@ -11,9 +11,11 @@ window.Stimulus = application
 // Import all controllers
 import PostActionsController from "../controllers/post_actions_controller"
 import NotificationController from "../controllers/notification_controller"
+import SourceFiltersController from "../controllers/source_filters_controller"
 
 application.register("post-actions", PostActionsController)
 application.register("notification", NotificationController)
+application.register("source-filters", SourceFiltersController)
 
 console.log('✅ Dev Dashboard loaded with Turbo and Stimulus')
 

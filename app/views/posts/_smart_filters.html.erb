@@ -1,5 +1,5 @@
 <!-- Smart Filter Presets -->
-<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+<div class="bg-white rounded-lg shadow-md p-6 mb-6" data-controller="source-filters">
   <!-- Quick Filter Presets -->
   <div class="mb-4">
     <h3 class="text-sm font-medium text-gray-700 mb-3">Quick Filters</h3>
@@ -136,12 +136,12 @@
     <div class="flex items-center justify-between mb-3">
       <h3 class="text-sm font-medium text-gray-700">Filter by Sources</h3>
       <div class="flex gap-2">
-        <button type="button" onclick="selectAllSources()" class="text-xs text-blue-600 hover:text-blue-800">Select All</button>
+        <button type="button" data-action="click->source-filters#selectAllSources" class="text-xs text-blue-600 hover:text-blue-800">Select All</button>
         <span class="text-xs text-gray-400">|</span>
-        <button type="button" onclick="clearAllSources()" class="text-xs text-blue-600 hover:text-blue-800">Clear All</button>
+        <button type="button" data-action="click->source-filters#clearAllSources" class="text-xs text-blue-600 hover:text-blue-800">Clear All</button>
       </div>
     </div>
-    <%= form_with url: posts_path, method: :get, local: true, id: "sources-filter-form" do |form| %>
+    <%= form_with url: posts_path, method: :get, id: "sources-filter-form", data: { turbo_frame: "posts-list" } do |form| %>
       <!-- Preserve other params -->
       <% [:keyword, :status, :tag, :min_priority, :after_date, :posted_after, :sort, :subreddit].each do |param| %>
         <% if params[param].present? %>
@@ -152,10 +152,13 @@
       <div class="flex flex-wrap gap-2 mb-3">
         <% @sources.each do |source| %>
           <% is_selected = source_selected?(source, params[:sources]) %>
-          <label class="inline-flex items-center cursor-pointer">
+          <label class="inline-flex items-center cursor-pointer" 
+                 data-source-filters-target="label" 
+                 data-action="click->source-filters#toggleSource">
             <%= check_box_tag "sources[]", source, is_selected, 
                              class: "sr-only source-checkbox",
-                             id: "source_#{source.parameterize.underscore}" %>
+                             id: "source_#{source.parameterize.underscore}",
+                             data: { source_filters_target: "checkbox" } %>
             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors <%= is_selected ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' %>">
               <div class="w-4 h-4 rounded mr-2 <%= source_icon_bg_class(source) %>"></div>
               <%= source %>
@@ -176,12 +179,13 @@
   
   <!-- Search and Advanced Options -->
   <div class="flex items-center gap-4">
-    <%= form_with url: posts_path, method: :get, local: true, class: "flex-1" do |form| %>
+    <%= form_with url: posts_path, method: :get, class: "flex-1", data: { turbo_frame: "posts-list" } do |form| %>
       <div class="relative">
         <%= form.text_field :keyword, 
                            placeholder: "Search posts...", 
                            value: params[:keyword],
-                           class: "w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+                           class: "w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
+                           data: { action: "keypress->source-filters#handleSearchKeypress" } %>
         <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
@@ -189,18 +193,18 @@
     <% end %>
     
     <button type="button" 
-            onclick="toggleAdvancedFilters()" 
+            data-action="click->source-filters#toggleAdvancedFilters"
             class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
       </svg>
-      <span id="advanced-toggle-text">More Filters</span>
+      <span data-source-filters-target="advancedToggleText">More Filters</span>
     </button>
   </div>
   
   <!-- Advanced Filters (Hidden by default) -->
-  <div id="advanced-filters" class="hidden mt-4 pt-4 border-t border-gray-200">
-    <%= form_with url: posts_path, method: :get, local: true do |form| %>
+  <div data-source-filters-target="advancedFilters" class="hidden mt-4 pt-4 border-t border-gray-200">
+    <%= form_with url: posts_path, method: :get, data: { turbo_frame: "posts-list" } do |form| %>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
@@ -255,73 +259,3 @@
     <% end %>
   </div>
 </div>
-
-<script>
-  function toggleAdvancedFilters() {
-    const advancedFilters = document.getElementById('advanced-filters');
-    const toggleText = document.getElementById('advanced-toggle-text');
-    
-    if (advancedFilters.classList.contains('hidden')) {
-      advancedFilters.classList.remove('hidden');
-      toggleText.textContent = 'Hide Filters';
-    } else {
-      advancedFilters.classList.add('hidden');
-      toggleText.textContent = 'More Filters';
-    }
-  }
-  
-  function selectAllSources() {
-    const checkboxes = document.querySelectorAll('.source-checkbox');
-    checkboxes.forEach(checkbox => {
-      checkbox.checked = true;
-      const span = checkbox.closest('label').querySelector('span');
-      span.classList.remove('bg-gray-100', 'text-gray-700');
-      span.classList.add('bg-blue-600', 'text-white');
-    });
-  }
-  
-  function clearAllSources() {
-    const checkboxes = document.querySelectorAll('.source-checkbox');
-    checkboxes.forEach(checkbox => {
-      checkbox.checked = false;
-      const span = checkbox.closest('label').querySelector('span');
-      span.classList.remove('bg-blue-600', 'text-white');
-      span.classList.add('bg-gray-100', 'text-gray-700');
-    });
-  }
-  
-  // Auto-submit search form on enter
-  document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.querySelector('input[name="keyword"]');
-    if (searchInput) {
-      searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          this.form.submit();
-        }
-      });
-    }
-    
-    // Make source checkboxes toggle on label click
-    const sourceCheckboxes = document.querySelectorAll('.source-checkbox');
-    sourceCheckboxes.forEach(checkbox => {
-      const label = checkbox.closest('label');
-      if (label) {
-        label.addEventListener('click', function(e) {
-          e.preventDefault();
-          checkbox.checked = !checkbox.checked;
-          
-          // Update visual state
-          const span = this.querySelector('span');
-          if (checkbox.checked) {
-            span.classList.remove('bg-gray-100', 'text-gray-700');
-            span.classList.add('bg-blue-600', 'text-white');
-          } else {
-            span.classList.remove('bg-blue-600', 'text-white');
-            span.classList.add('bg-gray-100', 'text-gray-700');
-          }
-        });
-      }
-    });
-  });
-</script>

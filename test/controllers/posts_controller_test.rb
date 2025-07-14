@@ -57,6 +57,65 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_includes @response.body, 'github'
   end
 
+  test "should filter posts by multiple sources" do
+    sign_in_as(@user)
+    
+    # Create posts with different sources
+    github_post = Post.create!(
+      source: 'GitHub Issues',
+      external_id: 'multi_1',
+      title: 'Multi GitHub Post',
+      url: 'https://github.com/test/1',
+      author: 'Test',
+      posted_at: Time.current,
+      status: 'unread'
+    )
+    
+    hf_post = Post.create!(
+      source: 'HuggingFace Forum',
+      external_id: 'multi_2',
+      title: 'Multi HF Post',
+      url: 'https://huggingface.co/test/1',
+      author: 'Test',
+      posted_at: Time.current,
+      status: 'unread'
+    )
+    
+    reddit_post = Post.create!(
+      source: 'Reddit',
+      external_id: 'multi_3',
+      title: 'Multi Reddit Post',
+      url: 'https://reddit.com/test/1',
+      author: 'Test',
+      posted_at: Time.current,
+      status: 'unread'
+    )
+    
+    # Filter by multiple sources
+    get posts_url, params: { sources: ['GitHub Issues', 'HuggingFace Forum'] }
+    assert_response :success
+    
+    # Should include posts from selected sources
+    assert_includes @response.body, 'Multi GitHub Post'
+    assert_includes @response.body, 'Multi HF Post'
+    
+    # Should not include posts from non-selected sources
+    assert_not_includes @response.body, 'Multi Reddit Post'
+    
+    # Clean up
+    [github_post, hf_post, reddit_post].each(&:destroy)
+  end
+
+  test "should handle empty sources array" do
+    sign_in_as(@user)
+    
+    get posts_url, params: { sources: [] }
+    assert_response :success
+    
+    # Should show all posts when no sources selected
+    # This tests the default behavior
+  end
+
   test "should filter posts by keyword" do
     get posts_url, params: { keyword: 'ruby' }
     assert_response :success

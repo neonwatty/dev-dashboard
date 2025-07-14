@@ -69,6 +69,18 @@ class PostsController < ApplicationController
     @sources = Source.active.pluck(:name).compact
     @all_tags = extract_all_tags
     @subreddits = extract_all_subreddits
+    
+    # Handle Turbo Frame requests for filtering
+    respond_to do |format|
+      format.html # Regular page load
+      format.turbo_stream do
+        # For Turbo Frame requests, render both posts and pagination
+        render turbo_stream: [
+          turbo_stream.replace("posts-list", partial: "posts/posts_list", locals: { posts: @posts }),
+          turbo_stream.replace("posts-pagination", partial: "posts/pagination", locals: { posts: @posts })
+        ]
+      end
+    end
   end
 
   def show

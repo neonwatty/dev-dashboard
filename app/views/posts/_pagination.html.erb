@@ -1,0 +1,7 @@
+<%= turbo_frame_tag "posts-pagination" do %>
+  <div class="mt-8 flex justify-center">
+    <div class="bg-white rounded-lg shadow-sm">
+      <%= paginate posts, params: { turbo_frame: "posts-list" } %>
+    </div>
+  </div>
+<% end %>
