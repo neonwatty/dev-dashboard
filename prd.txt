@@ -1,0 +1,230 @@
+# 📄 Product Requirements Document (PRD)
+
+## 1. Overview
+
+This app is a **developer-focused aggregation dashboard** that collects new and trending questions, issues, and discussions from forums like Hugging Face and PyTorch (Discourse-based), GitHub Issues, Hacker News, and optionally Reddit. The goal is to surface opportunities where the user can contribute—by answering questions, troubleshooting bugs, or engaging with OSS discussions.
+
+---
+
+## 2. Goals
+
+* Aggregate public, help-worthy forum posts and GitHub issues.
+* Enable filtering by keyword, topic, platform, tag, or “unanswered” status.
+* Provide a clean, searchable feed interface using Rails 8 + Vite + Tailwind.
+* Support easy addition/removal of sources (forums, subreddits, GitHub repos, RSS feeds).
+* Serve as a personal radar for contributing to ML and OSS communities.
+* Suggest draft responses for unanswered posts to accelerate helpful replies.
+* Rank posts using a scoring mechanism to surface the most relevant or time-sensitive ones.
+* Track user interactions with posts (read, ignored, responded).
+* Provide usage metrics to help track engagement and contribution.
+* Support export of high-value content to Markdown, email, or other formats.
+
+---
+
+## 3. Core Use Cases
+
+* **Rapid Forum Scanning**: View the latest Hugging Face / PyTorch posts from Discourse forums.
+* **GitHub Triage**: Surface open issues from specified repos (e.g., “transformers”, “diffusers”).
+* **Hacker News Tracking**: Catch relevant tech discussions or job threads.
+* **Reddit Monitoring**: Watch for relevant questions on ML subreddits.
+* **Reply Suggestions**: Use generated draft replies to reduce friction in engaging.
+* **Scored Feed**: Prioritize items based on a composite score.
+* **Interaction Tracking**: Log what you’ve read, ignored, or replied to.
+* **Digest Exporting**: Send selected content to email or markdown output.
+
+---
+
+## 4. Technical Architecture
+
+### 4.1 Frameworks and Tools
+
+| Component        | Tech                                                |
+| ---------------- | --------------------------------------------------- |
+| Web Framework    | Ruby on Rails 8                                     |
+| JS Packaging     | Vite + [vite\_ruby](https://vite-ruby.netlify.app/) |
+| UI Styling       | Tailwind CSS                                        |
+| Background Jobs  | In-memory (async) or SQLite-backed ActiveJob queues |
+| Data Persistence | SQLite                                              |
+
+### 4.2 Data Sources and Integrations
+
+| Source             | Method                            | Notes                                        |
+| ------------------ | --------------------------------- | -------------------------------------------- |
+| Hugging Face Forum | Discourse API via `discourse_api` | `https://discuss.huggingface.co/latest.json` |
+| PyTorch Forum      | Same as above                     | `https://discuss.pytorch.org/latest.json`    |
+| GitHub Issues      | REST API via `octokit`            | Token required for rate limit lifting        |
+| Hacker News        | RSS via `feedjira`                | `https://hnrss.org/newest?q=your-query`      |
+| Reddit             | API via `redd`                    | Requires OAuth credentials                   |
+
+---
+
+## 5. Data Models
+
+### `Post` Table
+
+| Field             | Type       | Description                              |
+| ----------------- | ---------- | ---------------------------------------- |
+| `source`          | string     | e.g. `huggingface`, `github`, `hn`       |
+| `external_id`     | string     | Unique ID from source (e.g. topic ID)    |
+| `title`           | string     | Post/issue title                         |
+| `url`             | string     | Direct link to the post                  |
+| `author`          | string     | Display name or username                 |
+| `posted_at`       | datetime   | UTC time of posting                      |
+| `summary`         | text       | Optional body excerpt                    |
+| `tags`            | json/array | Tags or labels (e.g. “LoRA”, “help”)     |
+| `status`          | enum       | `unread`, `read`, `ignored`, `responded` |
+| `priority_score`  | float      | Computed score for relevance/urgency     |
+| `llm_reply_draft` | text       | Optional draft response text             |
+
+### `Source` Table
+
+| Field             | Type     | Notes                                                          |
+| ----------------- | -------- | -------------------------------------------------------------- |
+| `name`            | string   | e.g. "Transformers GitHub"                                     |
+| `source_type`     | enum     | `github`, `reddit`, `discourse`, `rss`                         |
+| `url`             | string   | Base API or feed URL                                           |
+| `config`          | jsonb    | e.g., `{ "repo": "huggingface/transformers", "token": "..." }` |
+| `active`          | boolean  | Whether it is included in scheduled fetches                    |
+| `last_fetched_at` | datetime | Used for polling logic                                         |
+| `status`          | string   | Result of last connection test (e.g., "ok", "unauthorized")    |
+
+---
+
+## 5.3 LLM Reply Suggestion Workflow (via ruby\_llm)
+
+### Integration Strategy
+
+* Use a modular service object (`PostReplySuggester`) that interfaces with [ruby\_llm](https://github.com/crmne/ruby_llm).
+* `ruby_llm` allows dynamic selection of LLM providers (OpenAI, Anthropic, Ollama, etc.) using a unified API.
+* Provider and model can be set via app config or per-source/user in the settings panel.
+* Tokens/keys for each provider are securely stored and editable in the profile screen.
+
+### System Prompt Template
+
+The prompt structure for suggesting replies should:
+
+* Include the title, summary (if available), tags, and source type.
+* Emphasize helpfulness, empathy, and minimalism.
+* Be tailored slightly by source (e.g., GitHub vs forum).
+
+**Example prompt:**
+
+```
+You are a helpful developer assistant reviewing community posts. Based on the title and summary below, generate a short, helpful response that might assist the user or request more context.
+
+Title: {{post.title}}
+Tags: {{post.tags}}
+Source: {{post.source}}
+
+Summary:
+{{post.summary}}
+
+Your reply should be brief, friendly, and direct. Do not solve the entire problem — point in the right direction or ask clarifying questions.
+```
+
+### LLM Provider Options
+
+Using [`ruby_llm`](https://github.com/crmne/ruby_llm), the app supports the following providers:
+
+| Provider     | Notes                                                         |
+| ------------ | ------------------------------------------------------------- |
+| OpenAI       | Use `ENV['OPENAI_API_KEY']`; works with GPT-3.5, GPT-4        |
+| Ollama       | Local provider, runs llama2, phi, etc.; set `OLLAMA_API_BASE` |
+| Anthropic    | Set `ANTHROPIC_API_KEY`; Claude family support                |
+| Hugging Face | Supports Inference API or custom-hosted endpoints             |
+| AWS Bedrock  | Configure region and access key/token for enterprise models   |
+
+`ruby_llm` selects the provider dynamically via `model:` and `provider:` options passed to the `chat` method.
+
+Example:
+
+```ruby
+llm = RubyLLM.chat(provider: :openai, model: 'gpt-4')
+reply = llm.with_instructions(system_prompt).ask(user_prompt)
+```
+
+Responses should be cached to avoid regeneration unless the post content changes. `http`/custom | Pay-per-token or host your own        |
+
+Responses should be cached to avoid regeneration unless the post content changes.
+
+---
+
+## 6. Background Jobs
+
+| Job Name               | Trigger       | Description                               |
+| ---------------------- | ------------- | ----------------------------------------- |
+| `FetchHuggingFaceJob`  | Manual / Poll | Fetches new posts from Hugging Face Forum |
+| `FetchPytorchJob`      | Manual / Poll | Fetches new posts from PyTorch Forum      |
+| `FetchGitHubIssuesJob` | Manual / Poll | Fetches GitHub issues for watched repos   |
+| `FetchHackerNewsJob`   | Manual / Poll | Parses HN RSS feeds by keyword            |
+| `FetchRedditPostsJob`  | Manual / Poll | Pulls subreddit posts with filters        |
+| `SuggestPostReplyJob`  | On Insert     | Uses LLM to suggest a reply draft         |
+| `ScorePostsJob`        | On Insert     | Computes relevance/urgency score          |
+
+Jobs run in memory or SQLite queue and can be manually triggered per source.
+
+---
+
+## 7. Frontend UX Sketch
+
+| Feature             | Description                                           |
+| ------------------- | ----------------------------------------------------- |
+| Feed UI             | List of posts showing title, tags, time, source, link |
+| Filter Bar          | Keyword, source, tag, unanswered toggle               |
+| Manual Refresh      | Trigger fetch job per source                          |
+| Bookmark Post       | Save for later review                                 |
+| Tag Viewer          | Quickly filter by tag (from GitHub/Discourse/Reddit)  |
+| Priority Sorting    | View by most relevant posts (based on score)          |
+| Interaction Buttons | Mark as read / ignored / responded                    |
+| Reply Draft Viewer  | View LLM-generated draft reply (editable)             |
+| Export Options      | Copy to markdown or email digest                      |
+| Activity Panel      | Track your interaction metrics over time              |
+
+---
+
+## 8. Setup / Profile Screen
+
+A centralized place to manage all source integrations:
+
+| Feature             | Description                                         |
+| ------------------- | --------------------------------------------------- |
+| Add/Remove Sources  | Configure forum, GitHub, subreddit, or RSS feed     |
+| Set API Credentials | Store token, OAuth credentials (encrypted)          |
+| Configure Filters   | Subreddit name, GitHub labels, Discourse tags, etc. |
+| Test Connection     | Validate token and API URL works                    |
+| Status Indicator    | Show last fetch result / error info                 |
+
+---
+
+## 9. Gems and Packages
+
+| Use Case      | Gem             |
+| ------------- | --------------- |
+| Discourse API | `discourse_api` |
+| GitHub API    | `octokit`       |
+| Reddit API    | `redd`          |
+| RSS Feeds     | `feedjira`      |
+
+---
+
+## 10. MVP Plan
+
+### Phase 1
+
+* [ ] Scaffold Rails 8 app with Vite + Tailwind
+* [ ] Post + Source models
+* [ ] Fetch Hugging Face + PyTorch topics
+* [ ] Manual refresh system
+* [ ] Basic feed UI with filtering
+
+### Phase 2
+
+* [ ] GitHub Issues + Hacker News integration
+* [ ] Source management UI with connection testing
+* [ ] Bookmarking + tag filters
+* [ ] Reddit integration with credentials
+* [ ] Post scoring and reply draft jobs
+* [ ] Read/ignored/responded tracking
+* [ ] Export and metrics dashboard
+
+---
