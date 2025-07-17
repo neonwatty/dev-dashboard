@@ -82,20 +82,6 @@ module ApplicationHelper
     end
   end
   
-  def status_badge_class(status)
-    case status
-    when 'unread'
-      'bg-blue-500'
-    when 'read'
-      'bg-green-500'
-    when 'ignored'
-      'bg-gray-500'
-    when 'responded'
-      'bg-purple-500'
-    else
-      'bg-gray-500'
-    end
-  end
   
   def source_identifier_for(source)
     case source.source_type
@@ -144,15 +130,15 @@ module ApplicationHelper
   def status_badge_class(status)
     case status
     when 'unread'
-      'bg-blue-100 text-blue-800'
+      'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
     when 'read'
-      'bg-green-100 text-green-800'
+      'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
     when 'ignored'
-      'bg-gray-100 text-gray-800'
+      'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
     when 'responded'
-      'bg-purple-100 text-purple-800'
+      'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
     else
-      'bg-gray-100 text-gray-800'
+      'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
     end
   end
 end

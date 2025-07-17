@@ -1,8 +1,14 @@
 // Import and register all your controllers from the importmap via controllers/**/*_controller
 import { application } from "controllers/application"
 
-// Manually import our post actions controller for now
+// Manually import our controllers
 import PostActionsController from "./post_actions_controller"
-application.register("post-actions", PostActionsController)
+import DarkModeController from "./dark_mode_controller"
 
-console.log("🎯 PostActionsController registered manually!")
+// Register controllers
+application.register("post-actions", PostActionsController)
+application.register("dark-mode", DarkModeController)
+
+console.log("🎯 PostActionsController registered:", application.router.controllerAttribute)
+console.log("🌙 DarkModeController registered:", application.router.controllerAttribute)
+console.log("📝 All registered controllers:", Object.keys(application.router.modulesByIdentifier))
