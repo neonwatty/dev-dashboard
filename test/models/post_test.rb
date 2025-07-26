@@ -157,4 +157,151 @@ class PostTest < ActiveSupport::TestCase
     post.priority_score = -5.0
     assert post.valid?
   end
+  
+  # Expiration tests
+  test "expired_for_user scope should return posts older than user retention days" do
+    user = users(:one)
+    user.user_setting&.destroy
+    user.create_user_setting(post_retention_days: 7)
+    
+    # Create posts of different ages
+    old_post = Post.create!(
+      source: "Test",
+      external_id: "old-test",
+      title: "Old Post",
+      url: "http://example.com/old",
+      author: "tester",
+      status: "unread",
+      posted_at: 10.days.ago
+    )
+    
+    recent_post = Post.create!(
+      source: "Test",
+      external_id: "recent-test",
+      title: "Recent Post",
+      url: "http://example.com/recent",
+      author: "tester",
+      status: "unread",
+      posted_at: 5.days.ago
+    )
+    
+    expired_posts = Post.expired_for_user(user)
+    assert_includes expired_posts, old_post
+    assert_not_includes expired_posts, recent_post
+  end
+  
+  test "not_expired_for_user scope should return posts within user retention days" do
+    user = users(:one)
+    user.user_setting&.destroy
+    user.create_user_setting(post_retention_days: 7)
+    
+    # Create posts of different ages
+    old_post = Post.create!(
+      source: "Test",
+      external_id: "old-test2",
+      title: "Old Post",
+      url: "http://example.com/old2",
+      author: "tester",
+      status: "unread",
+      posted_at: 10.days.ago
+    )
+    
+    recent_post = Post.create!(
+      source: "Test",
+      external_id: "recent-test2",
+      title: "Recent Post",
+      url: "http://example.com/recent2",
+      author: "tester",
+      status: "unread",
+      posted_at: 5.days.ago
+    )
+    
+    active_posts = Post.not_expired_for_user(user)
+    assert_not_includes active_posts, old_post
+    assert_includes active_posts, recent_post
+  end
+  
+  test "expired_for? should return true for posts older than retention days" do
+    user = users(:one)
+    user.user_setting&.destroy
+    user.create_user_setting(post_retention_days: 7)
+    
+    old_post = Post.create!(
+      source: "Test",
+      external_id: "expired-check",
+      title: "Old Post",
+      url: "http://example.com/expired",
+      author: "tester",
+      status: "unread",
+      posted_at: 10.days.ago
+    )
+    
+    assert old_post.expired_for?(user)
+  end
+  
+  test "expired_for? should return false for posts within retention days" do
+    user = users(:one)
+    user.user_setting&.destroy
+    user.create_user_setting(post_retention_days: 7)
+    
+    recent_post = Post.create!(
+      source: "Test",
+      external_id: "not-expired-check",
+      title: "Recent Post",
+      url: "http://example.com/notexpired",
+      author: "tester",
+      status: "unread",
+      posted_at: 5.days.ago
+    )
+    
+    assert_not recent_post.expired_for?(user)
+  end
+  
+  test "expired_for? should return false when user is nil" do
+    post = posts(:huggingface_post)
+    assert_not post.expired_for?(nil)
+  end
+  
+  test "days_until_expiry_for should calculate remaining days correctly" do
+    user = users(:one)
+    user.user_setting&.destroy
+    user.create_user_setting(post_retention_days: 7)
+    
+    post = Post.create!(
+      source: "Test",
+      external_id: "expiry-calc",
+      title: "Test Post",
+      url: "http://example.com/expiry",
+      author: "tester",
+      status: "unread",
+      posted_at: 5.days.ago
+    )
+    
+    # Post is 5 days old, retention is 7 days, so 2 days remaining
+    assert_equal 2, post.days_until_expiry_for(user)
+  end
+  
+  test "days_until_expiry_for should return negative for expired posts" do
+    user = users(:one)
+    user.user_setting&.destroy
+    user.create_user_setting(post_retention_days: 7)
+    
+    post = Post.create!(
+      source: "Test",
+      external_id: "expired-calc",
+      title: "Old Post",
+      url: "http://example.com/expired-calc",
+      author: "tester",
+      status: "unread",
+      posted_at: 10.days.ago
+    )
+    
+    # Post is 10 days old, retention is 7 days, so -3 days (expired 3 days ago)
+    assert_equal -3, post.days_until_expiry_for(user)
+  end
+  
+  test "days_until_expiry_for should return nil when user is nil" do
+    post = posts(:huggingface_post)
+    assert_nil post.days_until_expiry_for(nil)
+  end
 end

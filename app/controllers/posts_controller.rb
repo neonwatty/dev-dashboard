@@ -10,6 +10,11 @@ class PostsController < ApplicationController
     
     @posts = Post.all
     
+    # Filter out expired posts for the current user (unless showing expired)
+    if Current.user && params[:show_expired] != 'true'
+      @posts = @posts.not_expired_for_user(Current.user)
+    end
+    
     # Hide ignored posts by default unless explicitly filtering for them
     unless params[:status] == 'ignored' || params[:show_all] == 'true'
       @posts = @posts.where.not(status: 'ignored')

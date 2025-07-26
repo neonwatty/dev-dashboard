@@ -71,7 +71,11 @@
       "Bash(test/system/sources_refresh_test.rb:*)",
       "Bash(app/javascript/controllers/application.js )",
       "Bash(app/javascript/controllers/index.js )",
-      "Bash(app/views/posts/_smart_filters.html.erb)"
+      "Bash(app/views/posts/_smart_filters.html.erb)",
+      "Bash(mkdir:*)",
+      "Bash(tree:*)",
+      "Bash(bundle show:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }
