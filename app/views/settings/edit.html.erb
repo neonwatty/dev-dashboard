@@ -1,0 +1,88 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Settings</h1>
+      
+      <form action="<%= settings_path %>" method="post" accept-charset="UTF-8">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+        <input type="hidden" name="_method" value="patch">
+        
+        <% if @user_setting&.errors&.any? %>
+          <div class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+            <div class="flex">
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                  There were <%= pluralize(@user_setting.errors.count, "error") %> with your submission
+                </h3>
+                <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                  <ul class="list-disc pl-5 space-y-1">
+                    <% @user_setting.errors.full_messages.each do |message| %>
+                      <li><%= message %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <div class="space-y-6">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Post Retention</h2>
+            
+            <div class="space-y-4">
+              <div>
+                <label for="user_setting_post_retention_days" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Delete posts older than:
+                </label>
+                <div class="flex items-center space-x-3">
+                  <input type="number" 
+                         name="user_setting[post_retention_days]" 
+                         id="user_setting_post_retention_days"
+                         value="<%= @user_setting&.post_retention_days || 30 %>"
+                         min="1" 
+                         max="365" 
+                         class="block w-24 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                  <span class="text-sm text-gray-600 dark:text-gray-400">days</span>
+                </div>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Posts older than this will be automatically deleted daily. Choose between 1 and 365 days.
+                </p>
+                
+                <% if @user_setting %>
+                  <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                    Current value: <%= @user_setting.post_retention_days %> days
+                  </p>
+                <% end %>
+              </div>
+              
+              <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+                <div class="flex">
+                  <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-blue-700 dark:text-blue-200">
+                      Posts are deleted automatically once per day at 3:00 AM. The deletion process considers the most generous retention setting across all users to avoid removing posts others may still need.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+          <div class="flex items-center justify-between">
+            <%= link_to "Cancel", posts_path, class: "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors" %>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer transition-colors">
+              Save Settings
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

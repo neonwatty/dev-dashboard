@@ -12,6 +12,8 @@ class Post < ApplicationRecord
   scope :by_source, ->(source) { where(source: source) }
   scope :by_priority, -> { order(priority_score: :desc) }
   scope :recent, -> { order(posted_at: :desc) }
+  scope :expired_for_user, ->(user) { where("posted_at < ?", user.settings.post_retention_days.days.ago) }
+  scope :not_expired_for_user, ->(user) { where("posted_at >= ?", user.settings.post_retention_days.days.ago) }
   
   def tags_array
     return [] if tags.blank?
@@ -51,5 +53,16 @@ class Post < ApplicationRecord
   
   def source_name
     source_record&.name || source
+  end
+  
+  def expired_for?(user)
+    return false unless user
+    posted_at < user.settings.post_retention_days.days.ago
+  end
+  
+  def days_until_expiry_for(user)
+    return nil unless user
+    days_old = (Time.current - posted_at) / 1.day
+    user.settings.post_retention_days - days_old.to_i
   end
 end
