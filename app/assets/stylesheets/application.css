@@ -8,3 +8,12 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* Import mobile navigation styles */
+@import "mobile_navigation.css";
+
+/* Import mobile component styles */
+@import "mobile_components.css";
+
+/* Import touch feedback styles */
+@import "touch_feedback.css";

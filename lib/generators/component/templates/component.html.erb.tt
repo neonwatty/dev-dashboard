@@ -1,0 +1,37 @@
+<%# <%= class_name %> Component %>
+<%# Mobile-optimized component with responsive layout %>
+
+<div class="<%= container_classes %>"
+     data-testid="<%= file_name.gsub('_', '-') %>-component"<% if options[:stimulus] %>
+     data-controller="<%= stimulus_controller_name %>"<% end %>>
+  
+  <div class="<%= content_classes %>">
+    <%# Component content goes here %>
+    <%# Example structure: %>
+    
+    <%# Header section %>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="<%= responsive_text_size(mobile_size: 'text-lg', desktop_size: 'text-xl') %> font-semibold text-gray-900 dark:text-gray-100">
+        <%= class_name %>
+      </h2>
+    </div>
+    
+    <%# Main content area %>
+    <div class="<%= responsive_grid_classes(mobile_cols: 1, desktop_cols: 2) %>">
+      <%# Add your content here %>
+      <p class="text-gray-600 dark:text-gray-300">
+        Mobile-responsive <%= class_name.downcase %> component content.
+      </p>
+    </div>
+    
+    <%# Action buttons (touch-friendly) %>
+    <div class="flex flex-col sm:flex-row gap-3 mt-6">
+      <button type="button" class="<%= mobile_button_classes(style: :primary) %>">
+        Primary Action
+      </button>
+      <button type="button" class="<%= mobile_button_classes(style: :secondary) %>">
+        Secondary Action  
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="<%= field_wrapper_classes %>">
+  <% if show_label? %>
+    <label for="<%= id %>" class="<%= label_classes %>">
+      <%= label %><%= required_indicator %>
+    </label>
+  <% end %>
+  
+  <%= render_field %>
+  
+  <% if show_help_text? %>
+    <p class="<%= help_text_classes %>">
+      <%= help_text %>
+    </p>
+  <% end %>
+  
+  <% if show_error? %>
+    <p class="<%= error_classes %>">
+      <%= error %>
+    </p>
+  <% end %>
+</div>

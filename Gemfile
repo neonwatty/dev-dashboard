@@ -19,6 +19,9 @@ gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# ViewComponent for reusable view components [https://viewcomponent.org]
+gem "view_component"
+
 # External API integrations
 gem "discourse_api"
 gem "octokit"

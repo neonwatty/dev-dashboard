@@ -1,0 +1,443 @@
+/* Touch target base styles */
+.touch-target {
+  @apply relative overflow-hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Touch ripple effect overlay */
+.touch-target::before {
+  content: '';
+  @apply absolute inset-0 opacity-0 bg-current;
+  @apply transition-opacity duration-300 pointer-events-none;
+  border-radius: inherit;
+}
+
+.touch-target:active::before {
+  @apply opacity-10;
+}
+
+/* Enhanced touch feedback variations with smooth animations */
+.touch-target.touch-feedback-light:active {
+  @apply transition-transform duration-150 ease-out;
+  transform: scale(0.97);
+}
+
+.touch-target.touch-feedback-medium:active {
+  @apply bg-gray-100 dark:bg-gray-700 transition-all duration-150;
+  transform: scale(0.98);
+}
+
+.touch-target.touch-feedback-heavy:active {
+  @apply shadow-inner transition-all duration-150;
+  transform: scale(0.96);
+}
+
+/* Button specific feedback with smooth animations */
+.btn-touch {
+  @apply touch-target touch-feedback-medium;
+  @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  @apply transition-all duration-150 ease-out;
+}
+
+.btn-touch:active {
+  @apply bg-opacity-80;
+  transform: scale(0.95);
+}
+
+/* Card touch feedback with native feel */
+.card-touch {
+  @apply touch-target touch-feedback-light;
+  @apply transition-all duration-200 ease-out;
+  will-change: transform;
+}
+
+.card-touch:active {
+  @apply shadow-md;
+  transform: scale(0.98) translateY(1px);
+}
+
+/* Swipe indicators with smooth animations */
+.swipe-indicator {
+  @apply absolute inset-y-0 flex items-center justify-center;
+  @apply px-6 opacity-0 transition-all duration-300 ease-out;
+  @apply text-white font-semibold text-sm;
+  @apply pointer-events-none z-10;
+  transform: scale(0.9);
+  will-change: opacity, transform;
+}
+
+.swipe-indicator.active {
+  @apply opacity-100;
+  transform: scale(1);
+}
+
+.swipe-indicator-left {
+  @apply left-0 bg-gradient-to-r from-green-600 to-green-500;
+  @apply rounded-r-2xl shadow-lg;
+  background-size: 200% 100%;
+  animation: swipeShimmer 2s ease-in-out infinite;
+}
+
+.swipe-indicator-right {
+  @apply right-0 bg-gradient-to-l from-red-600 to-red-500;
+  @apply rounded-l-2xl shadow-lg;
+  background-size: 200% 100%;
+  animation: swipeShimmer 2s ease-in-out infinite;
+}
+
+.swipe-indicator-text {
+  @apply ml-2 tracking-wide;
+}
+
+/* Icon animations in swipe indicators */
+.swipe-indicator svg {
+  @apply transition-transform duration-300;
+}
+
+.swipe-indicator.active svg {
+  @apply animate-pulse;
+  transform: scale(1.1);
+}
+
+@keyframes swipeShimmer {
+  0% { background-position: 200% 50%; }
+  100% { background-position: -200% 50%; }
+}
+
+/* Swipe wrapper with enhanced visual boundaries */
+.swipe-wrapper {
+  @apply relative overflow-hidden;
+  contain: layout style;
+}
+
+/* Post card swipe states with smooth physics */
+.post-card {
+  @apply relative;
+  transition: transform 200ms cubic-bezier(0.4, 0.0, 0.2, 1),
+              opacity 200ms ease-out,
+              background-color 150ms ease-out;
+  will-change: transform;
+}
+
+.post-card.dragging {
+  @apply transition-none;
+}
+
+.post-card.swipe-read {
+  @apply bg-green-50 dark:bg-green-900/20;
+  animation: swipeSuccess 400ms ease-out;
+}
+
+.post-card.swipe-cleared {
+  @apply bg-red-50 dark:bg-red-900/20;
+  animation: swipeSuccess 400ms ease-out;
+}
+
+@keyframes swipeSuccess {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+
+/* Pull to refresh indicator with iOS-style spring physics */
+.pull-refresh-indicator {
+  @apply absolute top-0 left-1/2 transform -translate-x-1/2;
+  @apply bg-white dark:bg-gray-800 rounded-full shadow-lg;
+  @apply p-3 flex flex-col items-center justify-center;
+  @apply z-50 text-gray-600 dark:text-gray-400;
+  transition: transform 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55),
+              opacity 300ms ease-out,
+              background-color 200ms ease-out,
+              box-shadow 200ms ease-out;
+  will-change: transform, opacity;
+}
+
+.pull-refresh-indicator.ready {
+  @apply bg-gradient-to-br from-blue-500 to-blue-600 text-white;
+  @apply shadow-xl shadow-blue-500/25;
+  animation: pulseReady 1s ease-in-out infinite;
+}
+
+.pull-refresh-indicator.refreshing {
+  @apply bg-white dark:bg-gray-800;
+  animation: none;
+}
+
+.pull-refresh-indicator.refreshing .refresh-icon {
+  animation: spin 1s linear infinite;
+}
+
+.pull-refresh-indicator.success {
+  @apply bg-gradient-to-br from-green-500 to-green-600 text-white;
+  @apply shadow-xl shadow-green-500/25;
+  animation: successBounce 500ms ease-out;
+}
+
+.pull-refresh-indicator.error {
+  @apply bg-gradient-to-br from-red-500 to-red-600 text-white;
+  @apply shadow-xl shadow-red-500/25;
+  animation: errorShake 500ms ease-out;
+}
+
+.pull-refresh-indicator .refresh-icon {
+  @apply transition-transform duration-300;
+}
+
+.pull-refresh-indicator .refresh-text {
+  @apply text-xs font-semibold mt-1 tracking-wide;
+  @apply opacity-0 transition-opacity duration-300;
+}
+
+.pull-refresh-indicator.ready .refresh-text,
+.pull-refresh-indicator.refreshing .refresh-text {
+  @apply opacity-100;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseReady {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.05); }
+}
+
+@keyframes successBounce {
+  0% { transform: translateX(-50%) scale(0.9); }
+  50% { transform: translateX(-50%) scale(1.1); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(-50%) rotate(0deg); }
+  25% { transform: translateX(-50%) rotate(-5deg); }
+  75% { transform: translateX(-50%) rotate(5deg); }
+}
+
+/* Long press menu with backdrop blur and smooth animations */
+.long-press-menu {
+  @apply fixed bg-white/95 dark:bg-gray-800/95 rounded-2xl shadow-2xl;
+  @apply overflow-hidden transform scale-90 opacity-0;
+  @apply z-50 border border-gray-200/50 dark:border-gray-700/50;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 200ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  will-change: transform, opacity;
+}
+
+.long-press-menu.visible {
+  @apply scale-100 opacity-100;
+  animation: menuSlideIn 300ms ease-out;
+}
+
+.long-press-action {
+  @apply flex items-center px-5 py-3.5 w-full;
+  @apply text-left text-gray-700 dark:text-gray-300;
+  @apply hover:bg-gray-100/80 dark:hover:bg-gray-700/80;
+  @apply transition-all duration-150;
+  @apply border-b border-gray-100/50 dark:border-gray-700/50 last:border-b-0;
+  @apply min-w-[180px];
+  position: relative;
+}
+
+.long-press-action::after {
+  content: '';
+  @apply absolute inset-0 bg-gray-900 dark:bg-white opacity-0;
+  @apply transition-opacity duration-150;
+  border-radius: inherit;
+}
+
+.long-press-action:active::after {
+  @apply opacity-5;
+}
+
+.long-press-action-icon {
+  @apply mr-3 text-gray-500 dark:text-gray-400;
+  @apply transition-transform duration-150;
+}
+
+.long-press-action:active .long-press-action-icon {
+  transform: scale(0.9);
+}
+
+.long-press-action-label {
+  @apply text-sm font-semibold tracking-wide;
+}
+
+@keyframes menuSlideIn {
+  0% {
+    transform: scale(0.9) translateY(10px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Long press visual feedback with smooth scaling */
+.long-pressing {
+  animation: longPressPulse 500ms ease-out forwards;
+}
+
+.long-pressing::after {
+  content: '';
+  @apply absolute inset-0 bg-gray-900 bg-opacity-5 dark:bg-white dark:bg-opacity-5;
+  @apply rounded-lg pointer-events-none;
+  animation: longPressGrow 500ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+}
+
+@keyframes longPressPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(0.98);
+  }
+}
+
+@keyframes longPressGrow {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Touch scrolling optimization */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  @apply overflow-x-auto;
+}
+
+.touch-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Material Design ripple effect with smooth expansion */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+  transform: scale(0);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.ripple-active {
+  animation: rippleExpand 700ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+  transform: scale(0);
+  animation: rippleExpand 400ms cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@keyframes rippleExpand {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  80% {
+    transform: scale(4);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Dark mode ripple with subtle gradient */
+.dark .ripple,
+.dark .ripple-effect {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.05) 100%);
+}
+
+/* Performance optimizations for smooth 60fps animations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* GPU acceleration hints for smooth animations */
+.post-card,
+.swipe-indicator,
+.pull-refresh-indicator,
+.long-press-menu,
+.ripple-effect {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Improve touch targets for mobile with better spacing */
+@media (max-width: 640px) {
+  .touch-target {
+    @apply min-h-[48px];
+  }
+  
+  button, a {
+    @apply min-h-[48px] min-w-[48px];
+  }
+  
+  /* Increase touch target padding on mobile */
+  .touch-target {
+    @apply py-3 px-4;
+  }
+  
+  /* Larger swipe indicators on mobile */
+  .swipe-indicator {
+    @apply px-8;
+  }
+  
+  /* Better spacing for long press menu items */
+  .long-press-action {
+    @apply py-4;
+  }
+}
+
+/* Additional visual polish */
+.touching {
+  @apply transition-all duration-100;
+  filter: brightness(0.95);
+}
+
+.dark .touching {
+  filter: brightness(1.1);
+}
+
+/* Smooth transitions for all interactive elements */
+.touch-target,
+.btn-touch,
+.card-touch,
+.post-card,
+.swipe-indicator,
+.pull-refresh-indicator,
+.long-press-menu {
+  @apply antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

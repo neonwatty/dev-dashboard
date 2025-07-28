@@ -76,7 +76,12 @@
       "Bash(tree:*)",
       "Bash(bundle show:*)",
       "Bash(rm:*)",
-      "Bash(ssh:*)"
+      "Bash(ssh:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(node:*)",
+      "Bash(bundle exec ruby:*)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   }

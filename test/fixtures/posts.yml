@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-huggingface_post:
-  source: "huggingface"
+one:
+  source: one
   external_id: "12345"
   title: "How to fine-tune transformers"
   url: https://discuss.huggingface.co/t/how-to-fine-tune-transformers/12345
@@ -14,7 +14,7 @@ huggingface_post:
   llm_reply_draft: 
 
 github_issue:
-  source: "github"
+  source: rails_github
   external_id: "55112"
   title: "Classes are reloaded during request specs since 7.2"
   url: https://github.com/rails/rails/issues/55112
@@ -27,7 +27,7 @@ github_issue:
   llm_reply_draft: 
 
 rss_post:
-  source: "rss"
+  source: ruby_blog_rss
   external_id: "ruby-news-456"
   title: "Ruby 3.4 New Features"
   url: https://example.com/ruby-34-features
@@ -40,7 +40,7 @@ rss_post:
   llm_reply_draft: 
 
 hackernews_post:
-  source: "hackernews"
+  source: hacker_news
   external_id: "123456"
   title: "Show HN: My new developer tool"
   url: https://news.ycombinator.com/item?id=123456
@@ -53,7 +53,7 @@ hackernews_post:
   llm_reply_draft: 
 
 responded_post:
-  source: "github"
+  source: rails_github
   external_id: "55200"
   title: "Feature request: Add new API endpoint"
   url: https://github.com/rails/rails/issues/55200
