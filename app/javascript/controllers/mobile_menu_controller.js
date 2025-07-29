@@ -149,14 +149,30 @@ export default class extends Controller {
     
     // Toggle drawer visibility
     if (this.hasDrawerTarget) {
-      this.drawerTarget.classList.toggle("open", isOpen)
-      this.drawerTarget.classList.toggle("closed", !isOpen)
+      if (isOpen) {
+        // Show drawer
+        this.drawerTarget.classList.remove("hidden")
+        this.drawerTarget.classList.add("open")
+        this.drawerTarget.classList.remove("closed")
+      } else {
+        // Hide drawer
+        this.drawerTarget.classList.add("hidden")
+        this.drawerTarget.classList.add("closed")
+        this.drawerTarget.classList.remove("open")
+      }
     }
     
     // Toggle backdrop visibility
     if (this.hasBackdropTarget) {
-      this.backdropTarget.classList.toggle("visible", isOpen)
-      this.backdropTarget.classList.toggle("hidden", !isOpen)
+      if (isOpen) {
+        // Show backdrop
+        this.backdropTarget.classList.remove("hidden")
+        this.backdropTarget.classList.add("visible")
+      } else {
+        // Hide backdrop
+        this.backdropTarget.classList.add("hidden")
+        this.backdropTarget.classList.remove("visible")
+      }
     }
   }
   

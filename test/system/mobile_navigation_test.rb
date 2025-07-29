@@ -8,7 +8,7 @@ class MobileNavigationTest < ApplicationSystemTestCase
     sign_in_as(@user)
     
     # Ensure we have test data
-    @source = sources(:one)
+    @source = sources(:huggingface_forum)
     @post = posts(:one)
   end
 
@@ -227,15 +227,18 @@ class MobileNavigationTest < ApplicationSystemTestCase
     
     # Test root path
     visit root_path
+    open_mobile_menu
     within(".mobile-drawer") do
       assert_selector("a[href='#{root_path}'].mobile-nav-link.active")
     end
     within(".bottom-nav") do
       assert_selector("a[href='#{root_path}'].bottom-nav-item.active")
     end
+    close_mobile_menu
 
     # Test sources path
     visit sources_path
+    open_mobile_menu
     within(".mobile-drawer") do
       assert_selector("a[href='#{sources_path}'].mobile-nav-link.active")
     end
@@ -302,7 +305,7 @@ class MobileNavigationTest < ApplicationSystemTestCase
     # assert_equal "false", button["aria-expanded"]
     # assert_equal "Open navigation menu", button["aria-label"]
 
-    drawer = find("[data-mobile-menu-target='drawer']")
+    drawer = find("[data-mobile-menu-target='drawer']", visible: :all)
     assert_equal "dialog", drawer["role"]
     assert_equal "true", drawer["aria-modal"]
     assert drawer["aria-labelledby"].present?
@@ -491,6 +494,7 @@ class MobileNavigationTest < ApplicationSystemTestCase
       
       if (drawer) {
         drawer.classList.remove('closed');
+        drawer.classList.remove('hidden');
         drawer.classList.add('open');
         drawer.setAttribute('aria-hidden', 'false');
       }
@@ -519,6 +523,7 @@ class MobileNavigationTest < ApplicationSystemTestCase
       if (drawer) {
         drawer.classList.remove('open');
         drawer.classList.add('closed');
+        drawer.classList.add('hidden');
         drawer.setAttribute('aria-hidden', 'true');
       }
       if (backdrop) {

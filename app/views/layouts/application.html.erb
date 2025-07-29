@@ -17,9 +17,10 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%# Load Tailwind FIRST so our custom styles can override it %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%# Then load our custom styles that override Tailwind %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= vite_client_tag %>
     <%= vite_javascript_tag 'application' %>
   </head>
@@ -91,7 +92,7 @@
                     aria-expanded="false">
               <div class="hamburger" data-mobile-menu-target="hamburger">
                 <div class="hamburger-line"></div>
-                <div class="hamburger-line my-1"></div>
+                <div class="hamburger-line"></div>
                 <div class="hamburger-line"></div>
               </div>
             </button>
@@ -107,7 +108,7 @@
     </div>
     
     <!-- Mobile Navigation Drawer -->
-    <div class="mobile-drawer closed" 
+    <div class="mobile-drawer closed hidden" 
          data-mobile-menu-target="drawer"
          role="dialog"
          aria-modal="true"
