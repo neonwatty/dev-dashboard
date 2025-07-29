@@ -1,62 +1,89 @@
-# CLAUDE.md
+# Claude Code Agent System
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Quick Start
 
-## Project Overview
+1. **Simple Tasks** → Direct to specialist agent
+2. **Complex Tasks** → Use `project-orchestrator` 
+3. **Errors** → Auto-escalate to `error-debugger`
 
-This is a **developer-focused aggregation dashboard** built with Rails 8 + Vite + Tailwind CSS that collects and surfaces new questions, issues, and discussions from various developer communities including:
+## Agent Reference
 
-- Hugging Face and PyTorch forums (Discourse-based)
-- GitHub Issues from specified repositories
-- Hacker News discussions
-- Reddit subreddits
+| Agent | Use For | Trigger Keywords |
+|-------|---------|------------------|
+| 🚂 `ruby-rails-expert` | Rails models, controllers, migrations | rails, model, controller, activerecord |
+| 📦 `javascript-package-expert` | npm/yarn, JS/TS code, Stimulus | npm, javascript, package, stimulus |
+| 🎨 `tailwind-css-expert` | Styling, UI, responsive design | css, tailwind, styling, ui |
+| 🧪 `test-runner-fixer` | Write/fix tests, coverage | test, spec, rspec, coverage |
+| 🐛 `error-debugger` | Debug errors, performance | error, bug, failing, debug |
+| 📋 `project-orchestrator` | Planning, coordination | plan, coordinate, complex |
+| 🔀 `git-auto-commit` | Create commits | commit, save changes |
 
-The goal is to surface opportunities for developers to contribute by answering questions, troubleshooting bugs, or engaging with OSS discussions.
+## Workflow
 
-## Tech Stack
+See visual workflow: [workflow-diagram.md](.claude/workflow-diagram.md)
 
-- **Web Framework**: Ruby on Rails 8
-- **JavaScript**: Vite + vite_ruby for asset bundling
-- **Styling**: Tailwind CSS
-- **Database**: SQLite for data persistence
-- **Background Jobs**: In-memory (async) or SQLite-backed ActiveJob queues
-- **LLM Integration**: ruby_llm gem for AI-powered reply suggestions
+## Communication Protocol
 
-## Key Architecture Components
+All agents use standardized JSON protocol: [communication-protocol.md](.claude/communication-protocol.md)
 
-### Data Models
-- **Post**: Stores aggregated content from various sources with fields for source, external_id, title, URL, author, tags, status, priority_score, and LLM-generated reply drafts
-- **Source**: Manages different data sources (GitHub repos, forums, RSS feeds) with configuration, credentials, and connection status
+## Router Configuration
 
-### Background Jobs
-- Source-specific fetch jobs for each platform (Hugging Face, PyTorch, GitHub, Hacker News, Reddit)
-- `SuggestPostReplyJob`: Uses LLM to generate draft responses
-- `ScorePostsJob`: Computes relevance/urgency scores for posts
+Automatic agent selection rules: [router.yaml](.claude/router.yaml)
 
-### LLM Integration
-- Uses `ruby_llm` gem for multi-provider LLM support (OpenAI, Anthropic, Ollama, Hugging Face, AWS Bedrock)
-- Generates helpful reply suggestions for community posts
-- Provider selection is configurable per source or user
+## Task Master Integration
 
-## Development Status
+**Import Task Master commands:**
+@./.taskmaster/CLAUDE.md
 
-**Current State**: This appears to be a new project with only basic documentation. The actual Rails application has not been scaffolded yet.
+All agents automatically:
+- Update task status via `mcp__task-master-ai__set_task_status`
+- Log progress via `mcp__task-master-ai__update_subtask`
 
-**Next Steps (based on PRD)**:
-1. Scaffold Rails 8 app with Vite + Tailwind
-2. Create Post and Source models
-3. Implement data fetching for Hugging Face and PyTorch forums
-4. Build basic feed UI with filtering capabilities
+## Starting Complex Tasks
 
-## External Integrations
+```bash
+Task(description="Brief description",
+     subagent_type="project-orchestrator", 
+     prompt="Create automatic workflow for: [detailed requirements]")
+```
 
-- **Discourse Forums**: Uses `discourse_api` gem for Hugging Face and PyTorch forums
-- **GitHub**: Uses `octokit` gem for GitHub Issues API
-- **Reddit**: Uses `redd` gem for Reddit API access
-- **RSS Feeds**: Uses `feedjira` gem for Hacker News and other RSS sources
+The orchestrator will:
+1. Analyze requirements
+2. Create delegation plan
+3. Launch specialist agents
+4. Monitor progress
+5. Handle errors/escalations
+6. Trigger git commit when complete
 
-## Security Considerations
+## Agent Communication Flow
 
-- API credentials are encrypted and stored securely
-- OAuth tokens managed per source in the profile screen
-- Environment variables used for LLM provider API keys
+```
+User Request → Analyze → Route to Agent → Execute → Report → Next Agent/Complete
+                  ↓
+              [Complex?] → project-orchestrator → Delegation Plan
+```
+
+## Error Handling
+
+Automatic escalation chain:
+1. Specialist agent attempts fix
+2. Escalate to `error-debugger`
+3. Escalate to `project-orchestrator`
+4. Replan and reassign
+
+## Best Practices
+
+- Let orchestrator handle multi-domain tasks
+- Trust automatic handoffs
+- Check Task Master for progress
+- Agents complete work before handoff
+- Use structured completion reports
+
+## Important Instructions
+
+- Do what's asked; nothing more, nothing less
+- Never create files unless necessary
+- Always prefer editing existing files
+- No unsolicited documentation creation
+
+For detailed agent capabilities, see individual agent files in `.claude/agents/`

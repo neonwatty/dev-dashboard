@@ -1,0 +1,32 @@
+# frozen_string_literal: true
+
+# <%= class_name %> component
+# Mobile-responsive ViewComponent with touch-friendly interactions
+class <%= component_class_name %> < <%= base_class_name %>
+  def initialize(**options)
+    @options = options
+  end
+
+  private
+
+  attr_reader :options
+
+  def container_classes
+    [
+      "bg-white dark:bg-gray-800 rounded-lg shadow-sm",
+      "border border-gray-200 dark:border-gray-700",
+      mobile_padding_classes
+    ].join(" ")
+  end
+
+  def content_classes
+    mobile_spacing_classes
+  end
+
+  # Add component-specific helper methods here
+  # Example:
+  # def title_classes
+  #   responsive_text_size(mobile_size: "text-lg", desktop_size: "text-xl") +
+  #   " font-semibold text-gray-900 dark:text-gray-100"
+  # end
+end

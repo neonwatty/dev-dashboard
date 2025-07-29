@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 mobile-padding">
   <div class="max-w-2xl mx-auto">
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Settings</h1>
@@ -42,7 +42,7 @@
                          value="<%= @user_setting&.post_retention_days || 30 %>"
                          min="1" 
                          max="365" 
-                         class="block w-24 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                         class="block w-24 h-12 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base">
                   <span class="text-sm text-gray-600 dark:text-gray-400">days</span>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -76,8 +76,8 @@
         
         <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
           <div class="flex items-center justify-between">
-            <%= link_to "Cancel", posts_path, class: "text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors" %>
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer transition-colors">
+            <%= link_to "Cancel", posts_path, class: "touch-target text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors" %>
+            <button type="submit" class="touch-target px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer transition-colors">
               Save Settings
             </button>
           </div>

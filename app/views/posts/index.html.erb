@@ -1,4 +1,7 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<div class="responsive-container mobile-padding" 
+     data-controller="pull-to-refresh" 
+     data-pull-to-refresh-url-value="<%= posts_path(format: :turbo_stream) %>"
+     data-pull-to-refresh-threshold-value="80">
   <!-- Simple Header -->
   <div class="mb-6">
     <div class="flex items-center justify-between">

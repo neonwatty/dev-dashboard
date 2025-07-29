@@ -8,3 +8,58 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* Import mobile navigation styles */
+@import "mobile_navigation_simple.css";
+
+/* Import mobile component styles */
+@import "mobile_components.css";
+
+/* Import touch feedback styles */
+@import "touch_feedback.css";
+
+/* Emergency hamburger menu fix - ensure visibility on mobile */
+/* Override md:hidden which only works for desktop, not mobile */
+button[data-mobile-menu-target="button"] {
+  display: flex !important;
+}
+
+@media (min-width: 768px) {
+  /* Hide on desktop */
+  button[data-mobile-menu-target="button"] {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Ensure button is visible */
+  button[data-mobile-menu-target="button"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Hamburger container */
+  .hamburger {
+    width: 24px !important;
+    height: 24px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 0 !important;
+  }
+  
+  /* Hamburger lines */
+  .hamburger-line {
+    width: 24px !important;
+    height: 2px !important;
+    background-color: #4b5563 !important;
+    display: block !important;
+    margin: 3px 0 !important;
+  }
+  
+  .dark .hamburger-line {
+    background-color: #d1d5db !important;
+  }
+}

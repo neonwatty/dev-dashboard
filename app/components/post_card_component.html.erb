@@ -1,0 +1,147 @@
+<%= turbo_frame_tag dom_id(post) do %>
+  <div class="<%= card_classes %>" 
+       data-controller="post-actions" 
+       data-post-actions-target="card"
+       id="<%= dom_id(post) %>_card">
+    
+    <!-- Mobile: Vertical layout, Desktop: Horizontal layout -->
+    <div class="<%= layout_classes %>">
+      
+      <!-- Source Badge (top on mobile, left on desktop) -->
+      <div class="<%= source_section_classes %>">
+        <div class="<%= source_icon_classes %>">
+          <%= render "posts/source_icon", source: post.source %>
+        </div>
+        <div class="<%= source_info_classes %>">
+          <div class="<%= source_type_classes %>">
+            <%= post.source_type.humanize %>
+          </div>
+          <div class="<%= source_name_classes %>" title="<%= post.source_name %>">
+            <%= truncated_source_name %>
+          </div>
+        </div>
+        
+        <!-- Status Badge (mobile - top right) -->
+        <div class="<%= mobile_status_badge_classes %>">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium <%= status_badge_class %>" 
+                data-status-badge
+                id="<%= dom_id(post) %>_status">
+            <%= status_display_text %>
+          </span>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="flex-1 min-w-0">
+        <!-- Title - larger on mobile -->
+        <h3 class="<%= title_classes %>">
+          <%= link_to post.title, post.url, 
+                      target: "_blank", 
+                      class: title_link_classes,
+                      data: { turbo: false } %>
+        </h3>
+        
+        <!-- Meta - single line on mobile -->
+        <div class="<%= meta_classes %>">
+          <span class="font-medium text-gray-700 dark:text-gray-300"><%= post.author %></span>
+          <span class="mx-2">•</span>
+          <time datetime="<%= post.posted_at.iso8601 %>" title="<%= formatted_posted_at %>">
+            <%= time_ago_text %>
+          </time>
+        </div>
+        
+        <!-- Summary - show less on mobile -->
+        <% if post.summary.present? %>
+          <p class="<%= summary_classes %>">
+            <%= truncated_summary %>
+          </p>
+        <% end %>
+        
+        <!-- Tags - horizontal scroll on mobile -->
+        <% if post.tags_array.any? %>
+          <div class="<%= tags_container_classes %>">
+            <% display_tags.each do |tag| %>
+              <%= link_to posts_path(tag: tag), class: tag_classes do %>
+                #<%= tag %>
+              <% end %>
+            <% end %>
+            <% if remaining_tags_count > 0 %>
+              <span class="inline-flex shrink-0 items-center px-2.5 py-0.5 text-xs text-gray-500 dark:text-gray-400">
+                +<%= remaining_tags_count %> more
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <!-- Priority Score -->
+        <% if show_priority_score? %>
+          <div class="inline-flex items-center gap-1 mb-3">
+            <svg class="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-xs font-medium text-orange-600 dark:text-orange-400">Priority: <%= rounded_priority_score %></span>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Desktop Status Badge -->
+      <div class="<%= desktop_status_badge_classes %>">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium <%= status_badge_class %>" 
+              data-status-badge
+              id="<%= dom_id(post) %>_status_desktop">
+          <%= status_display_text %>
+        </span>
+      </div>
+    </div>
+    
+    <!-- Actions - full width on mobile -->
+    <% if authenticated? %>
+      <div class="<%= actions_section_classes %>">
+        <!-- Action buttons - larger with labels on mobile -->
+        <div class="<%= action_buttons_container_classes %>" data-post-actions-target="buttons">
+          <% if post.status != 'read' %>
+            <button type="button"
+                    class="<%= action_button_classes(:read) %>"
+                    title="Mark as read"
+                    data-action="click->post-actions#markAsRead"
+                    data-url="<%= mark_as_read_post_path(post) %>"
+                    data-post-actions-target="readButton">
+              <svg class="<%= action_icon_classes %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="<%= action_label_classes %>">Read</span>
+            </button>
+          <% end %>
+          
+          <% if post.status != 'ignored' %>
+            <button type="button"
+                    class="<%= action_button_classes(:clear) %>"
+                    title="Clear from dashboard"
+                    data-action="click->post-actions#clear"
+                    data-url="<%= mark_as_ignored_post_path(post) %>"
+                    data-post-actions-target="clearButton">
+              <svg class="<%= action_icon_classes %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              <span class="<%= action_label_classes %>">Clear</span>
+            </button>
+          <% end %>
+          
+          <% if post.status != 'responded' %>
+            <button type="button"
+                    class="<%= action_button_classes(:respond) %>"
+                    title="Mark as responded"
+                    data-action="click->post-actions#markAsResponded"
+                    data-url="<%= mark_as_responded_post_path(post) %>"
+                    data-post-actions-target="respondButton">
+              <svg class="<%= action_icon_classes %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+              </svg>
+              <span class="<%= action_label_classes %>">Respond</span>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
