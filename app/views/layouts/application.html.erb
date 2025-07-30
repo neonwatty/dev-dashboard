@@ -25,18 +25,19 @@
     <%= vite_javascript_tag 'application' %>
   </head>
 
-  <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+  <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200" data-controller="mobile-menu">
     <!-- Navigation -->
-    <nav class="mobile-header bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700 transition-colors duration-200" data-controller="mobile-menu">
+    <nav class="mobile-header bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700 transition-colors duration-200">
       <div class="responsive-container">
         <div class="flex justify-between items-center h-14 md:h-16">
           <!-- Logo -->
           <div class="flex items-center">
-            <div class="flex-shrink-0 flex items-center">
-              <svg class="h-7 w-7 md:h-8 md:w-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <%= link_to root_path, class: "flex-shrink-0 flex items-center group" do %>
+              <svg class="h-7 w-7 md:h-8 md:w-8 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
-              <%= link_to "Dev Dashboard", root_path, class: "ml-2 text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" %>
+              <span class="ml-2 text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors hidden min-[360px]:inline">Dev Dashboard</span>
+            <% end %>
             </div>
             <!-- Desktop Navigation -->
             <div class="hidden md:ml-10 md:flex md:space-x-8">
@@ -85,7 +86,7 @@
             <% end %>
             
             <!-- Mobile Menu Button -->
-            <button class="md:hidden touch-target p-1 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" 
+            <button class="md:hidden touch-target p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ml-2" 
                     data-action="click->mobile-menu#toggle" 
                     data-mobile-menu-target="button"
                     aria-label="Open navigation menu"
@@ -108,7 +109,7 @@
     </div>
     
     <!-- Mobile Navigation Drawer -->
-    <div class="mobile-drawer closed hidden" 
+    <div class="mobile-drawer closed" 
          data-mobile-menu-target="drawer"
          role="dialog"
          aria-modal="true"
