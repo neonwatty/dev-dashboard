@@ -9,6 +9,10 @@ class Post < ApplicationRecord
   validates :posted_at, presence: true
   validates :status, presence: true
   
+  # Cache invalidation callbacks
+  after_update :clear_post_caches
+  after_destroy :clear_post_caches
+  
   scope :by_source, ->(source) { where(source: source) }
   scope :by_priority, -> { order(priority_score: :desc) }
   scope :recent, -> { order(posted_at: :desc) }
@@ -64,5 +68,19 @@ class Post < ApplicationRecord
     return nil unless user
     days_old = (Time.current - posted_at) / 1.day
     user.settings.post_retention_days - days_old.to_i
+  end
+  
+  private
+  
+  def clear_post_caches
+    # Clear caches when posts are updated
+    Rails.cache.delete_matched("posts/*")
+    Rails.cache.delete_matched("tags/*")
+    Rails.cache.delete_matched("subreddits/*")
+    # Clear fragment caches related to this post
+    ActionController::Base.new.expire_fragment([self, Current.user&.id, "post_card", "v2"])
+    ActionController::Base.new.expire_fragment([self, "main_content", "v2"])
+    ActionController::Base.new.expire_fragment([source_record, source, "source_badge", "v1"])
+    ActionController::Base.new.expire_fragment([self, "tags", Digest::MD5.hexdigest(tags)]) if tags.present?
   end
 end

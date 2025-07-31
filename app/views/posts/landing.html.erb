@@ -77,6 +77,25 @@
          data-lazy-load-threshold-value="100" 
          data-lazy-load-preload-count-value="3">
       
+      <!-- Example of progressive image loading for future image content -->
+      <div class="hidden demo-progressive-images space-y-4">
+        <%= progressive_image_tag(
+          "https://picsum.photos/400/300?random=1",
+          alt: "Example progressive image",
+          class: "progressive-aspect-photo rounded-lg shadow-md",
+          webp: "https://picsum.photos/400/300.webp?random=1",
+          dominant_color: "#4f46e5"
+        ) %>
+        
+        <%= progressive_image_tag(
+          "https://picsum.photos/600/400?random=2", 
+          alt: "Another progressive example",
+          class: "progressive-aspect-video rounded-lg shadow-md",
+          blur_amount: 15,
+          transition_duration: 500
+        ) %>
+      </div>
+      
       <!-- HuggingFace - Eager loaded (above fold) -->
       <%= community_icon('huggingface', 
             title: 'HuggingFace', 

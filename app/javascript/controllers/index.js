@@ -51,3 +51,6 @@ application.register("password-strength", PasswordStrengthController)
 
 import LazyLoadController from "./lazy_load_controller"
 application.register("lazy-load", LazyLoadController)
+
+import ProgressiveImageController from "./progressive_image_controller"
+application.register("progressive-image", ProgressiveImageController)

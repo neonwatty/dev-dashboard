@@ -119,6 +119,230 @@ module ImageHelper
     end
   end
 
+  # Progressive image loading with LQIP and WebP support
+  # 
+  # @param src [String] The high-quality image source URL
+  # @param options [Hash] HTML options and progressive loading options
+  # @option options [String] :alt Alt text for the image
+  # @option options [String] :lqip LQIP data URI (will be generated if not provided)
+  # @option options [String] :webp WebP source URL
+  # @option options [String] :sizes Responsive sizes attribute
+  # @option options [String] :srcset Source set for responsive images
+  # @option options [Boolean] :eager_load Skip progressive loading
+  # @option options [Integer] :blur_amount Initial blur amount for LQIP (default: 10)
+  # @option options [Integer] :transition_duration Transition duration in ms (default: 300)
+  # @option options [Boolean] :enable_dominant_color Use dominant color background
+  # @option options [String] :dominant_color Dominant color hex code
+  def progressive_image_tag(src, options = {})
+    return image_tag(src, options) if options[:eager_load]
+
+    # Extract progressive loading specific options
+    lqip = options.delete(:lqip)
+    webp_src = options.delete(:webp) || generate_webp_url(src)
+    sizes = options.delete(:sizes) || default_responsive_sizes
+    srcset = options.delete(:srcset) || generate_responsive_srcset(src)
+    blur_amount = options.delete(:blur_amount) || 10
+    transition_duration = options.delete(:transition_duration) || 300
+    enable_dominant_color = options.delete(:enable_dominant_color) { true }
+    dominant_color = options.delete(:dominant_color)
+
+    # Generate LQIP if not provided
+    lqip ||= generate_lqip_for_url(src) if src.present?
+
+    # Extract dominant color if enabled and not provided
+    if enable_dominant_color && dominant_color.blank? && src.present?
+      dominant_color = extract_dominant_color_for_url(src)
+    end
+
+    # Set up controller data attributes
+    controller_data = {
+      controller: 'progressive-image',
+      progressive_image_lqip_value: lqip,
+      progressive_image_webp_value: webp_src,
+      progressive_image_jpeg_value: src,
+      progressive_image_alt_value: options[:alt] || '',
+      progressive_image_sizes_value: sizes,
+      progressive_image_srcset_value: srcset,
+      progressive_image_transition_duration_value: transition_duration,
+      progressive_image_blur_amount_value: blur_amount,
+      progressive_image_enable_dominant_color_value: enable_dominant_color,
+      progressive_image_dominant_color_value: dominant_color
+    }.compact
+
+    # Merge with existing data attributes
+    options[:data] = (options[:data] || {}).merge(controller_data)
+
+    # Set up CSS classes
+    css_classes = Array(options[:class])
+    css_classes << 'progressive-image-container'
+    options[:class] = css_classes.join(' ')
+
+    # Create the container structure
+    content_tag(:div, options) do
+      # Placeholder div
+      placeholder_html = content_tag(:div, '', 
+        data: { progressive_image_target: 'placeholder' },
+        class: 'progressive-placeholder absolute inset-0 bg-gray-200'
+      )
+      
+      # High-quality image
+      image_options = {
+        data: { progressive_image_target: 'image' },
+        class: 'progressive-image absolute inset-0 w-full h-full object-cover opacity-0',
+        loading: 'lazy' # Fallback for browsers without JS
+      }
+      image_html = tag(:img, image_options)
+      
+      placeholder_html + image_html
+    end
+  end
+
+  # Progressive image with responsive picture element
+  # 
+  # @param sources [Hash] Hash of image sources by format/size
+  # @param fallback_src [String] Fallback image source
+  # @param options [Hash] Options for progressive loading
+  def progressive_picture_tag(sources, fallback_src, options = {})
+    return picture_tag(sources, fallback_src, options) if options[:eager_load]
+
+    # Extract progressive options
+    lqip = options.delete(:lqip) || generate_lqip_for_url(fallback_src)
+    transition_duration = options.delete(:transition_duration) || 300
+    blur_amount = options.delete(:blur_amount) || 10
+
+    # Set up controller data
+    controller_data = {
+      controller: 'progressive-image',
+      progressive_image_lqip_value: lqip,
+      progressive_image_transition_duration_value: transition_duration,  
+      progressive_image_blur_amount_value: blur_amount
+    }
+
+    options[:data] = (options[:data] || {}).merge(controller_data)
+
+    # Create progressive picture element
+    content_tag(:div, options.merge(class: 'progressive-picture-container relative')) do
+      # Placeholder
+      placeholder_html = content_tag(:div, '',
+        data: { progressive_image_target: 'placeholder' },
+        class: 'progressive-placeholder absolute inset-0 bg-gray-200'
+      )
+      
+      # Picture element
+      picture_html = content_tag(:picture, 
+        data: { progressive_image_target: 'picture' },
+        class: 'progressive-picture absolute inset-0 w-full h-full opacity-0'
+      ) do
+        source_tags = sources.map do |format, src|
+          tag(:source, srcset: src, type: "image/#{format}")
+        end.join.html_safe
+        
+        fallback_img = tag(:img, 
+          src: fallback_src,
+          data: { progressive_image_target: 'image' },
+          class: 'w-full h-full object-cover',
+          alt: options[:alt] || ''
+        )
+        
+        source_tags + fallback_img
+      end
+      
+      placeholder_html + picture_html
+    end
+  end
+
+  # Generate WebP URL from JPEG/PNG URL
+  # @param url [String] Original image URL
+  # @return [String] WebP URL
+  def generate_webp_url(url)
+    return nil unless url.present?
+    
+    # Simple URL transformation for WebP
+    # In a real app, this would integrate with your CDN or image service
+    url.gsub(/\.(jpe?g|png)$/i, '.webp')
+  end
+
+  # Generate responsive srcset for an image
+  # @param base_url [String] Base image URL
+  # @param sizes [Array] Array of sizes to generate
+  # @return [String] Srcset string
+  def generate_responsive_srcset(base_url, sizes = nil)
+    return nil unless base_url.present?
+    
+    sizes ||= Rails.application.config.responsive_image_sizes || [320, 480, 768, 1024, 1200, 1920]
+    
+    srcset_parts = sizes.map do |size|
+      responsive_url = generate_responsive_url(base_url, size)
+      "#{responsive_url} #{size}w"
+    end
+    
+    srcset_parts.join(', ')
+  end
+
+  # Generate responsive image URL for a specific size
+  # @param base_url [String] Base image URL  
+  # @param size [Integer] Width in pixels
+  # @return [String] Responsive image URL
+  def generate_responsive_url(base_url, size)
+    # This is a placeholder implementation
+    # In production, integrate with your CDN or image processing service
+    # Examples: Cloudinary, ImageKit, or custom Active Storage variants
+    
+    base_name = File.basename(base_url, '.*')
+    extension = File.extname(base_url)
+    directory = File.dirname(base_url)
+    
+    "#{directory}/#{base_name}_#{size}w#{extension}"
+  end
+
+  # Default responsive sizes attribute
+  # @return [String] Sizes attribute for responsive images
+  def default_responsive_sizes
+    "(max-width: 320px) 280px, (max-width: 480px) 440px, (max-width: 768px) 728px, (max-width: 1024px) 984px, (max-width: 1200px) 1160px, 1920px"
+  end
+
+  # Generate LQIP for external URL (cached)
+  # @param url [String] Image URL
+  # @return [String, nil] LQIP data URI or nil if generation fails
+  def generate_lqip_for_url(url)
+    return nil unless url.present?
+    
+    cache_key = "lqip/#{Digest::MD5.hexdigest(url)}"
+    
+    Rails.cache.fetch(cache_key, expires_in: Rails.application.config.image_processing_cache_duration) do
+      begin
+        ImageProcessingInstrumentation.instrument('lqip_generated', source: url) do
+          # In production, you'd want to process this asynchronously
+          # For now, we'll return a simple placeholder
+          generate_simple_lqip_placeholder
+        end
+      rescue => e
+        Rails.logger.warn "Failed to generate LQIP for #{url}: #{e.message}"
+        nil
+      end
+    end
+  end
+
+  # Extract dominant color for external URL (cached)
+  # @param url [String] Image URL
+  # @return [String] Hex color code
+  def extract_dominant_color_for_url(url)
+    return '#f3f4f6' unless url.present?
+    
+    cache_key = "dominant_color/#{Digest::MD5.hexdigest(url)}"
+    
+    Rails.cache.fetch(cache_key, expires_in: Rails.application.config.image_processing_cache_duration) do
+      begin
+        # Simple color extraction based on URL or other heuristics
+        # In production, this would analyze the actual image
+        extract_color_from_context(url)
+      rescue => e
+        Rails.logger.warn "Failed to extract dominant color for #{url}: #{e.message}"
+        '#f3f4f6'
+      end
+    end
+  end
+
   private
 
   # Generate default placeholder content for lazy loaded images
@@ -191,6 +415,54 @@ module ImageHelper
       'RSS Feeds'
     else
       'Community'
+    end
+  end
+
+  # Generate a simple LQIP placeholder
+  # @return [String] Data URI for LQIP
+  def generate_simple_lqip_placeholder
+    # Create a simple 32x20 pixel gradient placeholder
+    width, height = 32, 20
+    
+    svg = <<~SVG
+      <svg width="#{width}" height="#{height}" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#e5e7eb;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#f3f4f6;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grad)" />
+        <circle cx="50%" cy="50%" r="3" fill="#d1d5db" opacity="0.5" />
+      </svg>
+    SVG
+    
+    "data:image/svg+xml;base64,#{Base64.strict_encode64(svg.strip)}"
+  end
+
+  # Extract color based on URL context or patterns
+  # @param url [String] Image URL
+  # @return [String] Hex color code
+  def extract_color_from_context(url)
+    # Simple heuristic-based color extraction
+    # In production, you'd want actual image analysis
+    
+    case url.downcase
+    when /github/
+      '#24292e'
+    when /reddit/
+      '#ff4500'
+    when /hugging.*face/
+      '#ff6b00'
+    when /pytorch/
+      '#ee4c2c'
+    when /hacker.*news/
+      '#ff6600'
+    else
+      # Generate a subtle color based on URL hash
+      hash = Digest::MD5.hexdigest(url)
+      hue = hash[0..1].to_i(16) * 360 / 255
+      "hsl(#{hue}, 20%, 85%)"
     end
   end
 end

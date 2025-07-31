@@ -16,7 +16,13 @@ Rails.application.configure do
   config.action_controller.perform_caching = true
 
   # Cache assets for far-future expiry since they are all digest stamped.
-  config.public_file_server.headers = { "cache-control" => "public, max-age=#{1.year.to_i}" }
+  config.public_file_server.headers = {
+    "Cache-Control" => "public, max-age=#{1.year.to_i}",
+    "Expires" => 1.year.from_now.to_formatted_s(:rfc822)
+  }
+  
+  # Additional caching configuration
+  config.static_cache_control = "public, max-age=#{1.year.to_i}"
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
@@ -47,7 +53,15 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
 
   # Replace the default in-process memory cache store with a durable alternative.
-  # config.cache_store = :mem_cache_store
+  # Use Redis for caching in production for better performance and persistence
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch("REDIS_URL", "redis://localhost:6379/1"),
+    namespace: "dev_dashboard_cache",
+    expires_in: 1.hour,
+    race_condition_ttl: 10.seconds,
+    compress: true,
+    compression_threshold: 1024
+  }
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue

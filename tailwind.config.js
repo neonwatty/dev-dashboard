@@ -68,14 +68,16 @@ module.exports = {
       '9': '2.25rem',
       '10': '2.5rem',
     },
-    // Letter spacing for typography
+    // Enhanced letter spacing for better visual hierarchy
     letterSpacing: {
+      'tightest': '-0.075em',
       'tighter': '-0.05em',
       'tight': '-0.025em',
       'normal': '0em',
       'wide': '0.025em',
       'wider': '0.05em',
       'widest': '0.1em',
+      'ultra-wide': '0.15em',
     },
     extend: {
       maxWidth: {
@@ -173,13 +175,15 @@ module.exports = {
         '4': '4px',
       },
       
-      // Typography spacing utilities for vertical rhythm
+      // Enhanced typography spacing utilities for vertical rhythm
       spacing: {
         'rhythm': '1.5rem',        // 24px base rhythm unit
         'rhythm-half': '0.75rem',  // 12px half rhythm
         'rhythm-quarter': '0.375rem', // 6px quarter rhythm
+        'rhythm-eighth': '0.1875rem', // 3px eighth rhythm  
         'rhythm-double': '3rem',   // 48px double rhythm
         'rhythm-triple': '4.5rem', // 72px triple rhythm
+        'rhythm-quadruple': '6rem', // 96px quadruple rhythm
       },
       
       // Enhanced font weight scale
@@ -334,25 +338,26 @@ module.exports = {
 
       // Add typography component utilities
       addComponents({
-        // Semantic heading styles
+        // Enhanced semantic heading styles with better visual hierarchy
         '.heading-1': {
           fontSize: 'clamp(2.25rem, 1.95rem + 1.5vw, 3rem)',
-          lineHeight: '1.25',
+          lineHeight: '1.3',
           letterSpacing: '-0.025em',
-          fontWeight: '700',
+          fontWeight: '800',
           marginBottom: '1.5rem',
+          marginTop: '0',
         },
         '.heading-2': {
           fontSize: 'clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem)',
-          lineHeight: '1.3',
+          lineHeight: '1.35',
           letterSpacing: '-0.025em',
-          fontWeight: '600',
+          fontWeight: '700',
           marginBottom: '0.75rem',
           marginTop: '3rem',
         },
         '.heading-3': {
           fontSize: 'clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem)',
-          lineHeight: '1.35',
+          lineHeight: '1.4',
           letterSpacing: '0',
           fontWeight: '600',
           marginBottom: '0.75rem',
@@ -360,7 +365,7 @@ module.exports = {
         },
         '.heading-4': {
           fontSize: 'clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem)',
-          lineHeight: '1.4',
+          lineHeight: '1.5',
           letterSpacing: '0',
           fontWeight: '600',
           marginBottom: '0.375rem',
@@ -368,17 +373,17 @@ module.exports = {
         },
         '.heading-5': {
           fontSize: 'clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem)',
-          lineHeight: '1.45',
+          lineHeight: '1.55',
           letterSpacing: '0',
           fontWeight: '600',
           marginBottom: '0.375rem',
           marginTop: '0.75rem',
         },
         '.heading-6': {
-          fontSize: 'clamp(1rem, 0.95rem + 0.25vw, 1.125rem)',
-          lineHeight: '1.5',
-          letterSpacing: '0.025em',
-          fontWeight: '600',
+          fontSize: 'clamp(0.875rem, 0.825rem + 0.25vw, 1rem)',
+          lineHeight: '1.6',
+          letterSpacing: '0.05em',
+          fontWeight: '700',
           textTransform: 'uppercase',
           marginBottom: '0.375rem',
           marginTop: '0.75rem',
@@ -401,20 +406,27 @@ module.exports = {
           marginBottom: '0.75rem',
         },
         
-        // Display text for hero sections
+        // Enhanced display text for hero sections with stronger hierarchy
         '.display-1': {
           fontSize: 'clamp(3.75rem, 3.15rem + 3vw, 4.5rem)',
-          lineHeight: '1.15',
+          lineHeight: '1.2',
           letterSpacing: '-0.025em',
-          fontWeight: '800',
+          fontWeight: '900',
           marginBottom: '1.5rem',
         },
         '.display-2': {
           fontSize: 'clamp(3rem, 2.55rem + 2.25vw, 3.75rem)',
-          lineHeight: '1.2',
+          lineHeight: '1.25',
           letterSpacing: '-0.025em',
-          fontWeight: '700',
+          fontWeight: '800',
           marginBottom: '1.5rem',
+        },
+        '.display-3': {
+          fontSize: 'clamp(2.25rem, 1.95rem + 1.5vw, 3rem)',
+          lineHeight: '1.3',
+          letterSpacing: '-0.015em',
+          fontWeight: '700',
+          marginBottom: '0.75rem',
         },
         
         // Specialized text styles

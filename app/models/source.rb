@@ -9,6 +9,10 @@ class Source < ApplicationRecord
             unless: :github_trending?
   validates :active, inclusion: { in: [true, false] }
   
+  # Cache invalidation callbacks
+  after_update :clear_source_caches
+  after_destroy :clear_source_caches
+  
   scope :active, -> { where(active: true) }
   scope :auto_fetch_enabled, -> { where(auto_fetch_enabled: true) }
   scope :by_type, ->(type) { where(source_type: type) }
@@ -71,5 +75,15 @@ class Source < ApplicationRecord
       partial: "sources/recent_posts",
       locals: { source: self }
     )
+  end
+  
+  private
+  
+  def clear_source_caches
+    # Clear caches when sources are updated
+    Rails.cache.delete_matched("sources/*")
+    Rails.cache.delete_matched("posts/*")
+    # Clear fragment caches for posts that use this source
+    ActionController::Base.new.expire_fragment([self, name, "source_badge", "v1"])
   end
 end

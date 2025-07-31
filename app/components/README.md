@@ -72,6 +72,30 @@ Consistent, touch-friendly buttons:
 <% end %>
 ```
 
+### IconComponent
+
+A standardized icon component that provides consistent sizing, styling, and accessibility for SVG icons throughout the application.
+
+**Features:**
+- Standardized sizes: `xs` (12px), `sm` (16px), `md` (20px), `lg` (24px), `xl` (28px), `2xl` (32px)
+- Consistent 2px stroke width
+- Dark mode compatible with `currentColor`
+- Comprehensive icon library (navigation, actions, status, social)
+- Accessibility support with `aria-hidden="true"`
+
+```erb
+<!-- Basic usage -->
+<%= render IconComponent.new(name: :check) %>
+
+<!-- With size and custom classes -->
+<%= render IconComponent.new(name: :dashboard, size: :lg, css_class: "text-blue-500") %>
+
+<!-- Filled icons -->
+<%= render IconComponent.new(name: :check_circle_filled, fill: "currentColor", stroke: "none") %>
+```
+
+**Available icon categories:** Navigation (`:dashboard`, `:sources`, `:analytics`), Actions (`:check`, `:edit`, `:trash`), Status (`:refresh`, `:warning`, `:info`), Auth (`:login`, `:logout`), Dark mode (`:sun`, `:moon`), and more.
+
 ## Helper Methods
 
 The base component provides numerous helper methods:
