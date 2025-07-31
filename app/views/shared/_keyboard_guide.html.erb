@@ -1,0 +1,150 @@
+<div id="keyboard-guide" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden" 
+     role="dialog" aria-modal="true" aria-labelledby="keyboard-guide-title"
+     data-keyboard-shortcuts-target="guide">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 id="keyboard-guide-title" class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Keyboard Shortcuts
+        </h2>
+        <button class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                data-action="click->keyboard-shortcuts#hideGuide"
+                aria-label="Close shortcuts guide">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Navigation Shortcuts -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Navigation</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Go to Dashboard</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                g h
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Go to Sources</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                g s
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Go to Analysis</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                g a
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">New Source</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                g n
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Navigate down</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                j or ↓
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Navigate up</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                k or ↑
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Activate item</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                Enter
+              </kbd>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Shortcuts -->
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">Actions</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Refresh</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                r
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Mark all as read</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                m
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Toggle theme</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                g t
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Focus search</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                /
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Show this guide</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                ?
+              </kbd>
+            </div>
+            
+            <div class="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="text-sm text-gray-900 dark:text-gray-100">Close modals</span>
+              <kbd class="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded font-mono text-xs text-gray-800 dark:text-gray-200">
+                Esc
+              </kbd>
+            </div>
+          </div>
+        </div>
+
+        <!-- Help Text -->
+        <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            Press <kbd class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded font-mono text-xs">?</kbd> 
+            anytime to show this guide. Shortcuts work when you're not typing in form fields.
+          </p>
+          
+          <% if authenticated? %>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              You can disable keyboard shortcuts in your 
+              <%= link_to "settings", edit_settings_path, class: "text-blue-600 dark:text-blue-400 hover:underline" %>.
+            </p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop click handler -->
+<script>
+  document.addEventListener('click', function(e) {
+    const guide = document.getElementById('keyboard-guide');
+    if (guide && e.target === guide) {
+      guide.classList.add('hidden');
+    }
+  });
+</script>

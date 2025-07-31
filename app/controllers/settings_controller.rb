@@ -22,6 +22,6 @@ class SettingsController < ApplicationController
   end
   
   def user_setting_params
-    params.require(:user_setting).permit(:post_retention_days)
+    params.require(:user_setting).permit(:post_retention_days, :keyboard_shortcuts_enabled)
   end
 end

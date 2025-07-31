@@ -7,5 +7,6 @@ class UserSetting < ApplicationRecord
   # Sensible defaults
   after_initialize do
     self.post_retention_days ||= 30 if new_record?
+    self.keyboard_shortcuts_enabled = true if keyboard_shortcuts_enabled.nil? && new_record?
   end
 end

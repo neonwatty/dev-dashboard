@@ -35,6 +35,48 @@ module.exports = {
       '3xl': '1920px', // Large screens
       '4xl': '2560px', // Ultra-wide and 4K displays
     },
+    // Override default font sizes with fluid typography
+    fontSize: {
+      'xs': ['clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem)', { lineHeight: '1.4' }],
+      'sm': ['clamp(0.875rem, 0.825rem + 0.25vw, 1rem)', { lineHeight: '1.45' }],
+      'base': ['clamp(1rem, 0.95rem + 0.25vw, 1.125rem)', { lineHeight: '1.5' }],
+      'lg': ['clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem)', { lineHeight: '1.45' }],
+      'xl': ['clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem)', { lineHeight: '1.4' }],
+      '2xl': ['clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem)', { lineHeight: '1.35' }],
+      '3xl': ['clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem)', { lineHeight: '1.3' }],
+      '4xl': ['clamp(2.25rem, 1.95rem + 1.5vw, 3rem)', { lineHeight: '1.25' }],
+      '5xl': ['clamp(3rem, 2.55rem + 2.25vw, 3.75rem)', { lineHeight: '1.2' }],
+      '6xl': ['clamp(3.75rem, 3.15rem + 3vw, 4.5rem)', { lineHeight: '1.15' }],
+      '7xl': ['clamp(4.5rem, 3.75rem + 3.75vw, 6rem)', { lineHeight: '1.1' }],
+      '8xl': ['clamp(6rem, 4.5rem + 7.5vw, 8rem)', { lineHeight: '1.05' }],
+      '9xl': ['clamp(8rem, 6rem + 10vw, 12rem)', { lineHeight: '1' }],
+    },
+    // Enhanced line height scale
+    lineHeight: {
+      'none': '1',
+      'tight': '1.15',
+      'snug': '1.25',
+      'normal': '1.5',
+      'relaxed': '1.75',
+      'loose': '2',
+      '3': '.75rem',
+      '4': '1rem',
+      '5': '1.25rem',
+      '6': '1.5rem',
+      '7': '1.75rem',
+      '8': '2rem',
+      '9': '2.25rem',
+      '10': '2.5rem',
+    },
+    // Letter spacing for typography
+    letterSpacing: {
+      'tighter': '-0.05em',
+      'tight': '-0.025em',
+      'normal': '0em',
+      'wide': '0.025em',
+      'wider': '0.05em',
+      'widest': '0.1em',
+    },
     extend: {
       maxWidth: {
         'container': '1440px',
@@ -129,12 +171,34 @@ module.exports = {
       outlineWidth: {
         '3': '3px',
         '4': '4px',
+      },
+      
+      // Typography spacing utilities for vertical rhythm
+      spacing: {
+        'rhythm': '1.5rem',        // 24px base rhythm unit
+        'rhythm-half': '0.75rem',  // 12px half rhythm
+        'rhythm-quarter': '0.375rem', // 6px quarter rhythm
+        'rhythm-double': '3rem',   // 48px double rhythm
+        'rhythm-triple': '4.5rem', // 72px triple rhythm
+      },
+      
+      // Enhanced font weight scale
+      fontWeight: {
+        'thin': '100',
+        'extralight': '200', 
+        'light': '300',
+        'normal': '400',
+        'medium': '500',
+        'semibold': '600',
+        'bold': '700',
+        'extrabold': '800',
+        'black': '900',
       }
     },
   },
   plugins: [
     // Custom plugin for accessible utilities
-    function({ addUtilities, theme }) {
+    function({ addUtilities, addComponents, theme }) {
       addUtilities({
         // Container utilities for large screens
         '.container-responsive': {
@@ -264,6 +328,122 @@ module.exports = {
             '&:focus': {
               outlineWidth: '4px',
             },
+          },
+        },
+      })
+
+      // Add typography component utilities
+      addComponents({
+        // Semantic heading styles
+        '.heading-1': {
+          fontSize: 'clamp(2.25rem, 1.95rem + 1.5vw, 3rem)',
+          lineHeight: '1.25',
+          letterSpacing: '-0.025em',
+          fontWeight: '700',
+          marginBottom: '1.5rem',
+        },
+        '.heading-2': {
+          fontSize: 'clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem)',
+          lineHeight: '1.3',
+          letterSpacing: '-0.025em',
+          fontWeight: '600',
+          marginBottom: '0.75rem',
+          marginTop: '3rem',
+        },
+        '.heading-3': {
+          fontSize: 'clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem)',
+          lineHeight: '1.35',
+          letterSpacing: '0',
+          fontWeight: '600',
+          marginBottom: '0.75rem',
+          marginTop: '1.5rem',
+        },
+        '.heading-4': {
+          fontSize: 'clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem)',
+          lineHeight: '1.4',
+          letterSpacing: '0',
+          fontWeight: '600',
+          marginBottom: '0.375rem',
+          marginTop: '1.5rem',
+        },
+        '.heading-5': {
+          fontSize: 'clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem)',
+          lineHeight: '1.45',
+          letterSpacing: '0',
+          fontWeight: '600',
+          marginBottom: '0.375rem',
+          marginTop: '0.75rem',
+        },
+        '.heading-6': {
+          fontSize: 'clamp(1rem, 0.95rem + 0.25vw, 1.125rem)',
+          lineHeight: '1.5',
+          letterSpacing: '0.025em',
+          fontWeight: '600',
+          textTransform: 'uppercase',
+          marginBottom: '0.375rem',
+          marginTop: '0.75rem',
+        },
+        
+        // Body text styles
+        '.body-text': {
+          fontSize: 'clamp(1rem, 0.95rem + 0.25vw, 1.125rem)',
+          lineHeight: '1.5',
+          marginBottom: '1.5rem',
+        },
+        '.body-large': {
+          fontSize: 'clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem)',
+          lineHeight: '1.45',
+          marginBottom: '1.5rem',
+        },
+        '.body-small': {
+          fontSize: 'clamp(0.875rem, 0.825rem + 0.25vw, 1rem)',
+          lineHeight: '1.45',
+          marginBottom: '0.75rem',
+        },
+        
+        // Display text for hero sections
+        '.display-1': {
+          fontSize: 'clamp(3.75rem, 3.15rem + 3vw, 4.5rem)',
+          lineHeight: '1.15',
+          letterSpacing: '-0.025em',
+          fontWeight: '800',
+          marginBottom: '1.5rem',
+        },
+        '.display-2': {
+          fontSize: 'clamp(3rem, 2.55rem + 2.25vw, 3.75rem)',
+          lineHeight: '1.2',
+          letterSpacing: '-0.025em',
+          fontWeight: '700',
+          marginBottom: '1.5rem',
+        },
+        
+        // Specialized text styles
+        '.lead': {
+          fontSize: 'clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem)',
+          lineHeight: '1.45',
+          fontWeight: '400',
+          marginBottom: '1.5rem',
+        },
+        '.caption': {
+          fontSize: 'clamp(0.875rem, 0.825rem + 0.25vw, 1rem)',
+          lineHeight: '1.45',
+          marginBottom: '0.375rem',
+        },
+        '.label': {
+          fontSize: 'clamp(0.875rem, 0.825rem + 0.25vw, 1rem)',
+          lineHeight: '1.45',
+          fontWeight: '500',
+          letterSpacing: '0.025em',
+          textTransform: 'uppercase',
+        },
+        
+        // Responsive adjustments for small screens
+        '@media (max-width: 480px)': {
+          '.heading-2': {
+            marginTop: '1.5rem',
+          },
+          '.heading-3, .heading-4': {
+            marginTop: '0.75rem',
           },
         },
       })

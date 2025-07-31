@@ -48,3 +48,6 @@ application.register("form-validation", FormValidationController)
 
 import PasswordStrengthController from "./password_strength_controller"
 application.register("password-strength", PasswordStrengthController)
+
+import LazyLoadController from "./lazy_load_controller"
+application.register("lazy-load", LazyLoadController)

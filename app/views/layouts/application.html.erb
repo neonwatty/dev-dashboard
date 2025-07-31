@@ -25,7 +25,7 @@
     <%= vite_javascript_tag 'application' %>
   </head>
 
-  <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200" data-controller="mobile-menu screen-reader">
+  <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200" data-controller="mobile-menu screen-reader keyboard-shortcuts" data-keyboard-shortcuts-enabled-value="<%= authenticated? && Current.user&.settings&.keyboard_shortcuts_enabled != false %>">
     <!-- Skip Navigation Links for Accessibility -->
     <div class="skip-links">
       <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -220,6 +220,9 @@
 
     <!-- Notifications Container -->
     <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Keyboard Shortcuts Guide -->
+    <%= render 'shared/keyboard_guide' %>
 
     <!-- Main Content -->
     <main id="main-content" class="min-h-screen">

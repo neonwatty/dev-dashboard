@@ -4,6 +4,10 @@
        data-post-actions-target="card"
        data-swipe-actions-target="card"
        data-long-press-duration-value="500"
+       data-keyboard-navigable
+       tabindex="0"
+       role="article"
+       aria-label="Post: <%= post.title %>"
        id="<%= dom_id(post) %>_card">
     <!-- Mobile: Vertical layout, Desktop: Horizontal layout -->
     <div class="flex flex-col sm:flex-row sm:items-start sm:gap-4">
