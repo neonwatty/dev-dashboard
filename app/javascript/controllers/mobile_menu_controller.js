@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import SwipeHandler from "../utils/swipe_handler.js"
 
 /**
  * Mobile Menu Controller
@@ -40,6 +41,9 @@ export default class extends Controller {
     
     // Ensure menu is closed on initialization
     this.isOpen = false
+    this.isSwipeInProgress = false
+    this.swipeHandler = null
+    
     // Don't call closeMenu() here, just ensure correct initial classes
     if (this.hasDrawerTarget) {
       this.drawerTarget.classList.add("closed")
@@ -53,6 +57,9 @@ export default class extends Controller {
       this.hamburgerTarget.classList.remove("open")
     }
     
+    // Initialize swipe gesture support
+    this.initializeSwipeGestures()
+    
     // Add resize listener for responsive behavior
     window.addEventListener("resize", this.handleResize)
   }
@@ -63,6 +70,12 @@ export default class extends Controller {
     // Clean up event listeners
     document.removeEventListener("keydown", this.handleKeydown)
     window.removeEventListener("resize", this.handleResize)
+    
+    // Clean up swipe handler
+    if (this.swipeHandler) {
+      this.swipeHandler.destroy()
+      this.swipeHandler = null
+    }
     
     // Restore body scroll
     this.restoreBodyScroll()
@@ -116,6 +129,11 @@ export default class extends Controller {
     // Announce to screen readers
     this.announceToScreenReader("Navigation menu opened")
     
+    // Enable swipe gestures when menu opens
+    if (this.swipeHandler) {
+      this.swipeHandler.enable()
+    }
+    
     // Focus the first focusable element
     requestAnimationFrame(() => {
       this.focusFirstElement()
@@ -142,6 +160,9 @@ export default class extends Controller {
     
     // Remove focus trap
     this.removeFocusTrap()
+    
+    // Reset any swipe-related styles
+    this.resetSwipeStyles()
     
     // Announce to screen readers
     this.announceToScreenReader("Navigation menu closed")
@@ -347,8 +368,194 @@ export default class extends Controller {
     }))
   }
 
+  // Initialize swipe gesture support
+  initializeSwipeGestures() {
+    if (!this.hasDrawerTarget) {
+      console.warn("📱 Cannot initialize swipe gestures: drawer target not found")
+      return
+    }
+
+    // Create swipe handler for the drawer
+    this.swipeHandler = new SwipeHandler(this.drawerTarget, {
+      direction: 'horizontal',
+      threshold: 0.5, // 50% of drawer width to trigger close
+      onSwipeStart: this.handleSwipeStart.bind(this),
+      onSwipeMove: this.handleSwipeMove.bind(this),
+      onSwipeEnd: this.handleSwipeEnd.bind(this),
+      onSwipeCancel: this.handleSwipeCancel.bind(this)
+    })
+
+    console.log("📱 Swipe gestures initialized")
+  }
+
+  // Handle swipe start
+  handleSwipeStart(data) {
+    // Only enable swipe-to-close when menu is open
+    if (!this.isOpen) return
+
+    console.log("📱 Swipe started on drawer")
+    this.isSwipeInProgress = true
+
+    // Add swiping classes for optimized CSS
+    if (this.hasDrawerTarget) {
+      this.drawerTarget.classList.add('swiping')
+    }
+    if (this.hasBackdropTarget) {
+      this.backdropTarget.classList.add('swiping')
+    }
+  }
+
+  // Handle swipe move - provide visual feedback
+  handleSwipeMove(data) {
+    if (!this.isOpen || !this.isSwipeInProgress) return
+
+    // Only allow right swipe (closing direction)
+    if (data.direction !== 'right') return
+
+    // Calculate transform based on swipe progress
+    // Drawer starts at translateX(0) when open, moves to translateX(100%) when closed
+    const translateX = Math.min(data.progress * 100, 100)
+    
+    // Apply transform for visual feedback
+    if (this.hasDrawerTarget) {
+      this.drawerTarget.style.transform = `translateX(${translateX}%)`
+    }
+
+    // Reduce backdrop opacity based on swipe progress
+    if (this.hasBackdropTarget) {
+      const opacity = Math.max(1 - data.progress, 0)
+      this.backdropTarget.style.opacity = opacity.toString()
+    }
+
+    console.log(`📱 Swipe progress: ${(data.progress * 100).toFixed(1)}%`)
+  }
+
+  // Handle swipe end - determine if menu should close
+  handleSwipeEnd(data) {
+    if (!this.isOpen || !this.isSwipeInProgress) return
+
+    console.log(`📱 Swipe ended - Complete: ${data.isComplete}`)
+    
+    this.isSwipeInProgress = false
+
+    // Remove swiping classes
+    if (this.hasDrawerTarget) {
+      this.drawerTarget.classList.remove('swiping')
+    }
+    if (this.hasBackdropTarget) {
+      this.backdropTarget.classList.remove('swiping')
+    }
+
+    if (data.isComplete && data.direction === 'right') {
+      // Swipe was successful - close the menu
+      this.closeMenuFromSwipe()
+    } else {
+      // Swipe was cancelled or didn't meet threshold - snap back
+      this.snapBackToOpen()
+    }
+  }
+
+  // Handle swipe cancel
+  handleSwipeCancel(data) {
+    if (!this.isSwipeInProgress) return
+
+    console.log("📱 Swipe cancelled")
+    this.isSwipeInProgress = false
+
+    // Remove swiping classes and snap back
+    if (this.hasDrawerTarget) {
+      this.drawerTarget.classList.remove('swiping')
+    }
+    if (this.hasBackdropTarget) {
+      this.backdropTarget.classList.remove('swiping')
+    }
+    this.snapBackToOpen()
+  }
+
+  // Close menu from successful swipe gesture
+  closeMenuFromSwipe() {
+    console.log("📱 Closing menu from swipe gesture")
+
+    // Use the existing closeMenu method but skip the transform animation
+    // since we've already animated it during the swipe
+    this.isOpen = false
+
+    // Update visual states
+    this.updateVisualState(false)
+
+    // Update accessibility attributes
+    this.updateAccessibilityState(false)
+
+    // Restore body scroll
+    this.restoreBodyScroll()
+
+    // Remove keyboard event listeners
+    document.removeEventListener("keydown", this.handleKeydown)
+
+    // Remove focus trap
+    this.removeFocusTrap()
+
+    // Announce to screen readers
+    this.announceToScreenReader("Navigation menu closed")
+
+    // Return focus to the menu button
+    if (this.hasButtonTarget) {
+      this.buttonTarget.focus()
+    }
+
+    // Reset any inline styles applied during swipe
+    this.resetSwipeStyles()
+  }
+
+  // Snap back to open position when swipe is cancelled
+  snapBackToOpen() {
+    console.log("📱 Snapping drawer back to open position")
+
+    // Add snap-back classes for smooth animation
+    if (this.hasDrawerTarget) {
+      this.drawerTarget.classList.add('snapping-back')
+      this.drawerTarget.style.transform = 'translateX(0)'
+    }
+
+    // Reset backdrop opacity with snap-back animation
+    if (this.hasBackdropTarget) {
+      this.backdropTarget.classList.add('snapping-back')
+      this.backdropTarget.style.opacity = '1'
+    }
+
+    // Clean up classes and inline styles after animation
+    setTimeout(() => {
+      this.resetSwipeStyles()
+      if (this.hasDrawerTarget) {
+        this.drawerTarget.classList.remove('snapping-back')
+      }
+      if (this.hasBackdropTarget) {
+        this.backdropTarget.classList.remove('snapping-back')
+      }
+    }, 250) // Match CSS snap-back transition duration
+  }
+
+  // Reset any inline styles applied during swipe
+  resetSwipeStyles() {
+    if (this.hasDrawerTarget) {
+      this.drawerTarget.style.transform = ''
+      this.drawerTarget.style.transition = ''
+      // Remove any swipe-related classes
+      this.drawerTarget.classList.remove('swiping', 'snapping-back')
+    }
+    if (this.hasBackdropTarget) {
+      this.backdropTarget.style.opacity = ''
+      // Remove any swipe-related classes
+      this.backdropTarget.classList.remove('swiping', 'snapping-back')
+    }
+  }
+
+
   // Utility method for debugging
   debug() {
     console.log("📱 Mobile Menu State:", this.menuState)
+    if (this.swipeHandler) {
+      console.log("📱 Swipe Handler State:", this.swipeHandler.getState())
+    }
   }
 }

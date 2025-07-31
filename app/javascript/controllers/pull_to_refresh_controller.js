@@ -201,7 +201,43 @@ export default class extends Controller {
     this.indicatorTarget = this.indicatorElement
     
     // Initial hidden state
-    this.indicatorElement.style.transform = "translateY(-60px)"
+    this.indicatorElement.style.transform = "translateY(-80px) scale(0.8)"
     this.indicatorElement.style.opacity = "0"
+  }
+  
+  // Handle scroll events to detect normal scrolling vs pull gesture
+  handleScroll(event) {
+    if (this.isPulling) return
+    
+    // Clear any existing timeout
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout)
+    }
+    
+    // Set flag to indicate normal scrolling
+    this.isScrolling = true
+    
+    // Reset scrolling flag after scroll ends
+    this.scrollTimeout = setTimeout(() => {
+      this.isScrolling = false
+    }, 150)
+  }
+  
+  // Enable/disable pull to refresh programmatically
+  enable() {
+    this.enabledValue = true
+    this.indicatorElement.style.display = ''
+  }
+  
+  disable() {
+    this.enabledValue = false
+    this.resetPull()
+    this.indicatorElement.style.display = 'none'
+  }
+  
+  // Method to refresh programmatically
+  refresh() {
+    if (this.isRefreshing) return
+    this.triggerRefresh()
   }
 }

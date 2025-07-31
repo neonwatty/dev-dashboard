@@ -1,7 +1,12 @@
 <div class="responsive-container mobile-padding" 
-     data-controller="pull-to-refresh" 
+     data-controller="pull-to-refresh virtual-scroll pull-refresh-integration" 
      data-pull-to-refresh-url-value="<%= posts_path(format: :turbo_stream) %>"
-     data-pull-to-refresh-threshold-value="80">
+     data-pull-to-refresh-threshold-value="80"
+     data-virtual-scroll-total-items-value="<%= @posts.size %>"
+     data-virtual-scroll-page-value="<%= params[:page]&.to_i || 1 %>"
+     data-virtual-scroll-has-more-value="<%= @posts.respond_to?(:next_page) ? @posts.next_page.present? : false %>"
+     data-virtual-scroll-container-target="container"
+     data-pull-to-refresh-container-target="container">
   <!-- Simple Header -->
   <div class="mb-6">
     <div class="flex items-center justify-between">
@@ -28,15 +33,31 @@
     <%= render 'posts/smart_filters' %>
   <% end %>
 
-  <!-- Posts List -->
+  <!-- Posts List with Virtual Scrolling Support -->
   <%= turbo_frame_tag "posts-list" do %>
     <% if authenticated? && Source.active.count == 0 %>
       <!-- Welcome screen is shown above, no posts section needed -->
     <% elsif @posts.any? %>
-      <div class="space-y-4">
-        <% @posts.each do |post| %>
-          <%= render 'posts/post_card', post: post %>
-        <% end %>
+      <!-- Virtual scroll container structure -->
+      <div data-virtual-scroll-target="spacer" style="position: relative;">
+        <div data-virtual-scroll-target="viewport" class="space-y-4">
+          <% @posts.each do |post| %>
+            <div data-post-id="<%= post.id %>">
+              <%= render 'posts/post_card', post: post %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Loading indicator for infinite scroll -->
+      <div data-virtual-scroll-target="loadingIndicator" class="mt-8 text-center" style="display: none;">
+        <div class="flex items-center justify-center space-x-2">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-sm text-gray-500">Loading more posts...</span>
+        </div>
       </div>
     <% else %>
       <!-- Empty State -->

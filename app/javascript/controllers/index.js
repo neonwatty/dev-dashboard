@@ -25,6 +25,9 @@ application.register("post-actions", PostActionsController)
 import PullToRefreshController from "./pull_to_refresh_controller"
 application.register("pull-to-refresh", PullToRefreshController)
 
+import PullRefreshIntegrationController from "./pull_refresh_integration_controller"
+application.register("pull-refresh-integration", PullRefreshIntegrationController)
+
 import ScreenReaderController from "./screen_reader_controller"
 application.register("screen-reader", ScreenReaderController)
 
@@ -39,3 +42,9 @@ application.register("touch-feedback", TouchFeedbackController)
 
 import VirtualScrollController from "./virtual_scroll_controller"
 application.register("virtual-scroll", VirtualScrollController)
+
+import FormValidationController from "./form_validation_controller"
+application.register("form-validation", FormValidationController)
+
+import PasswordStrengthController from "./password_strength_controller"
+application.register("password-strength", PasswordStrengthController)
