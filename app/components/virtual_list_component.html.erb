@@ -1,0 +1,47 @@
+<%= content_tag :div, **stimulus_data_attributes, class: container_css_classes, 
+                   data: { virtual_scroll_target: "container" },
+                   "aria-label" => aria_label_for_container,
+                   tabindex: enable_virtual_scrolling? ? "0" : nil do %>
+  
+  <!-- Screen reader announcement -->
+  <%= virtual_scroll_announcement %>
+  
+  <!-- Virtual scroll spacer (only for virtual scrolling) -->
+  <% if enable_virtual_scrolling? %>
+    <%= content_tag :div, "", **spacer_attributes %>
+  <% end %>
+  
+  <!-- Viewport container -->
+  <%= content_tag :div, **viewport_attributes do %>
+    <%= render_posts %>
+  <% end %>
+  
+  <!-- Loading indicator for infinite scroll -->
+  <%= content_tag :div, **loading_indicator_attributes do %>
+    <div class="flex items-center justify-center space-x-2">
+      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <span class="text-sm text-gray-500">Loading more posts...</span>
+    </div>
+  <% end %>
+  
+  <!-- Development performance info -->
+  <% if Rails.env.development? && performance_info %>
+    <div class="virtual-scroll-debug fixed bottom-4 right-4 bg-black text-white text-xs p-2 rounded opacity-50 pointer-events-none">
+      <div>Total: <%= performance_info[:total_posts] %></div>
+      <div>Rendered: <%= performance_info[:rendered_posts] %></div>
+      <div>Virtual: <%= performance_info[:virtual_scrolling] ? 'ON' : 'OFF' %></div>
+      <div>Memory saved: <%= performance_info[:memory_saved] %></div>
+    </div>
+  <% end %>
+  
+<% end %>
+
+<!-- Inline styles for virtual scrolling (only when enabled) -->
+<% if enable_virtual_scrolling? %>
+  <style>
+    <%= virtual_scroll_styles.html_safe %>
+  </style>
+<% end %>

@@ -113,6 +113,9 @@ export default class extends Controller {
     // Focus trap
     this.setupFocusTrap()
     
+    // Announce to screen readers
+    this.announceToScreenReader("Navigation menu opened")
+    
     // Focus the first focusable element
     requestAnimationFrame(() => {
       this.focusFirstElement()
@@ -139,6 +142,9 @@ export default class extends Controller {
     
     // Remove focus trap
     this.removeFocusTrap()
+    
+    // Announce to screen readers
+    this.announceToScreenReader("Navigation menu closed")
     
     // Return focus to the menu button
     if (this.hasButtonTarget) {
@@ -333,6 +339,14 @@ export default class extends Controller {
     }
   }
   
+  // Announce changes to screen readers
+  announceToScreenReader(message) {
+    // Dispatch event for screen reader controller to handle
+    document.dispatchEvent(new CustomEvent('screenreader:status', {
+      detail: { message }
+    }))
+  }
+
   // Utility method for debugging
   debug() {
     console.log("📱 Mobile Menu State:", this.menuState)

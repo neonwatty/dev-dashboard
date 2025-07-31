@@ -1,0 +1,35 @@
+<!-- Empty State -->
+<div class="bg-white rounded-lg shadow-sm p-12 text-center">
+  <% if ['keyword', 'source', 'status', 'tag', 'min_priority', 'after_date', 'posted_after'].any? { |key| params[key].present? } %>
+    <!-- Filtered but no results -->
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+    </svg>
+    <h3 class="mt-2 text-lg font-medium text-gray-900">No posts match your filters</h3>
+    <p class="mt-1 text-sm text-gray-500">Try adjusting your search criteria or clearing some filters.</p>
+    <div class="mt-6">
+      <%= link_to "Clear All Filters", posts_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors" %>
+    </div>
+  <% else %>
+    <!-- No posts at all -->
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+    </svg>
+    <h3 class="mt-2 text-lg font-medium text-gray-900">No posts available yet</h3>
+    <p class="mt-1 text-sm text-gray-500">Your sources haven't been refreshed recently, or there might not be any new content.</p>
+    <div class="mt-6 space-x-3">
+      <% if authenticated? %>
+        <%= button_to refresh_all_sources_path, 
+                     method: :post,
+                     class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors",
+                     data: { disable_with: "Refreshing..." } do %>
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Refresh All Sources
+        <% end %>
+        <%= link_to "Manage Sources", sources_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

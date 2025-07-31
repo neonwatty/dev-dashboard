@@ -1,21 +1,45 @@
-<div class="<%= field_wrapper_classes %>">
-  <% if show_label? %>
-    <label for="<%= id %>" class="<%= label_classes %>">
-      <%= label %><%= required_indicator %>
-    </label>
-  <% end %>
-  
-  <%= render_field %>
-  
-  <% if show_help_text? %>
-    <p class="<%= help_text_classes %>">
-      <%= help_text %>
-    </p>
-  <% end %>
-  
-  <% if show_error? %>
-    <p class="<%= error_classes %>">
-      <%= error %>
-    </p>
-  <% end %>
-</div>
+<% if use_fieldset? %>
+  <fieldset class="<%= field_wrapper_classes %>">
+    <% if get_legend %>
+      <legend class="<%= label_classes %> text-base font-medium mb-2">
+        <%= get_legend %><%= required_indicator %>
+      </legend>
+    <% end %>
+    
+    <%= render_field %>
+    
+    <% if show_help_text? %>
+      <p id="<%= help_text_id %>" class="<%= help_text_classes %>">
+        <%= help_text %>
+      </p>
+    <% end %>
+    
+    <% if show_error? %>
+      <p id="<%= error_id %>" class="<%= error_classes %>" role="alert" aria-live="polite">
+        <%= error %>
+      </p>
+    <% end %>
+  </fieldset>
+<% else %>
+  <div class="<%= field_wrapper_classes %>">
+    <% if show_label? %>
+      <label for="<%= id %>" class="<%= label_classes %>">
+        <%= label %><%= required_indicator %>
+      </label>
+    <% end %>
+    
+    <%= render_field %>
+    
+    <% if show_help_text? %>
+      <p id="<%= help_text_id %>" class="<%= help_text_classes %>">
+        <%= help_text %>
+      </p>
+    <% end %>
+    
+    <% if show_error? %>
+      <p id="<%= error_id %>" class="<%= error_classes %>" role="alert" aria-live="polite">
+        <%= error %>
+      </p>
+    <% end %>
+  </div>
+<% end %>

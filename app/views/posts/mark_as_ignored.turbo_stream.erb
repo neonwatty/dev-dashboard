@@ -1,6 +1,24 @@
 <%# Remove the post card with animation %>
 <%= turbo_stream.remove dom_id(@post) %>
 
+<%# Notify virtual scroll controller of removal %>
+<%= turbo_stream.action :dispatch_event, :document do %>
+  <template>
+    <script>
+      (function() {
+        const event = new CustomEvent('virtual-scroll:remove-item', {
+          detail: { 
+            postId: '<%= @post.id %>',
+            action: 'remove',
+            status: '<%= @post.status %>'
+          }
+        });
+        document.dispatchEvent(event);
+      })();
+    </script>
+  </template>
+<% end %>
+
 <%# Update the post count in navigation %>
 <%= turbo_stream.update "post-count" do %>
   Posts: <%= Post.where.not(status: 'ignored').count %>
@@ -18,4 +36,10 @@
       <span>Post cleared from dashboard</span>
     </div>
   </div>
+<% end %>
+
+<%# Screen reader announcement %>
+<%= turbo_stream.append "sr-polite-announcements" do %>
+  <%= announce_success("ignored", @post.title.truncate(50)) %>
+  <%= announce_status("Post count updated to #{Post.where.not(status: 'ignored').count}") %>
 <% end %>

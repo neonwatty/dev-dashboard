@@ -68,7 +68,19 @@ class PostsController < ApplicationController
       @posts = @posts.recent
     end
     
-    @posts = @posts.page(params[:page]).per(20)
+    # Store total count before pagination for virtual scrolling
+    @total_count = @posts.count
+    
+    # Use virtual scrolling for large datasets, pagination for smaller ones
+    if @total_count >= 50 && params[:virtual_scroll] != 'false'
+      # For virtual scrolling, load more posts but still paginate server-side for memory efficiency
+      @posts = @posts.page(params[:page] || 1).per(100) # Load 100 at a time for virtual scroll
+      @use_virtual_scroll = true
+    else
+      # Traditional pagination for smaller datasets
+      @posts = @posts.page(params[:page]).per(20)
+      @use_virtual_scroll = false
+    end
     
     # For filter options
     @sources = Source.active.pluck(:name).compact
@@ -84,6 +96,20 @@ class PostsController < ApplicationController
           turbo_stream.replace("posts-list", partial: "posts/posts_list", locals: { posts: @posts }),
           turbo_stream.replace("posts-pagination", partial: "posts/pagination", locals: { posts: @posts })
         ]
+      end
+      format.json do
+        # For virtual scroll infinite loading
+        render json: {
+          posts: @posts.map { |post| 
+            {
+              id: post.id,
+              html: render_to_string(partial: 'posts/post_card', locals: { post: post }, formats: [:html])
+            }
+          },
+          has_more: @posts.respond_to?(:last_page?) ? !@posts.last_page? : false,
+          total_count: @total_count,
+          current_page: @posts.respond_to?(:current_page) ? @posts.current_page : 1
+        }
       end
     end
   end

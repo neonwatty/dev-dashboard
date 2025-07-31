@@ -57,3 +57,19 @@
     </div>
   <% end %>
 <% end %>
+
+<%# Screen reader announcements for posts list updates %>
+<%= turbo_stream.append "sr-polite-announcements" do %>
+  <% if @posts.any? %>
+    <%= search_results_announcement(@posts.total_count, params[:keyword]) %>
+    <% if params[:page].present? && params[:page].to_i > 1 %>
+      <%= pagination_announcement(params[:page].to_i, @posts.total_pages) %>
+    <% end %>
+  <% else %>
+    <% if ['keyword', 'source', 'status', 'tag', 'min_priority', 'after_date', 'posted_after'].any? { |key| params[key].present? } %>
+      <%= announce_politely("No posts match your current filters") %>
+    <% else %>
+      <%= announce_politely("No posts available") %>
+    <% end %>
+  <% end %>
+<% end %>

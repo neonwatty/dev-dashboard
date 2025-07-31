@@ -14,7 +14,7 @@
   <div class="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 py-12 sm:px-6 lg:px-8">
   <div class="w-full max-w-md space-y-8">
     <div>
-      <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+      <h2 id="signup-heading" class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
         Create your account
       </h2>
       <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
@@ -23,9 +23,9 @@
       </p>
     </div>
     
-    <%= form_with model: @user, url: registrations_path, class: "mt-8 space-y-6" do |form| %>
+    <%= form_with model: @user, url: registrations_path, class: "mt-8 space-y-6", role: "form", "aria-labelledby": "signup-heading" do |form| %>
       <% if @user.errors.any? %>
-        <div class="rounded-md bg-red-50 dark:bg-red-900/50 p-4">
+        <div class="rounded-md bg-red-50 dark:bg-red-900/50 p-4" role="alert" aria-live="polite" id="signup-errors">
           <div class="flex">
             <div class="ml-3">
               <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
@@ -43,32 +43,66 @@
         </div>
       <% end %>
 
-      <div class="-space-y-px rounded-md shadow-sm">
-        <div>
-          <%= form.label :email_address, "Email address", class: "sr-only" %>
-          <%= form.email_field :email_address, 
-                              autocomplete: "email", 
-                              required: true,
-                              placeholder: "Email address",
-                              class: "relative block w-full rounded-t-md border-0 py-1.5 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-400 sm:text-sm sm:leading-6" %>
+      <fieldset>
+        <legend class="sr-only">Account registration information</legend>
+        <div class="-space-y-px rounded-md shadow-sm">
+          <div>
+            <%= form.label :email_address, "Email address", class: "sr-only" %>
+            <%= form.email_field :email_address, 
+                                autocomplete: "email", 
+                                required: true,
+                                placeholder: "Email address",
+                                "aria-required": "true",
+                                "aria-label": "Email address",
+                                "aria-describedby": (@user.errors[:email_address].any? ? "email-error" : nil),
+                                "aria-invalid": (@user.errors[:email_address].any? ? "true" : "false"),
+                                class: "relative block w-full rounded-t-md border-0 py-1.5 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-400 sm:text-sm sm:leading-6" %>
+            <% if @user.errors[:email_address].any? %>
+              <p id="email-error" class="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+                <%= @user.errors[:email_address].first %>
+              </p>
+            <% end %>
+          </div>
+          <div>
+            <%= form.label :password, "Password", class: "sr-only" %>
+            <%= form.password_field :password, 
+                                   autocomplete: "new-password", 
+                                   required: true,
+                                   placeholder: "Password",
+                                   "aria-required": "true",
+                                   "aria-label": "Password",
+                                   "aria-describedby": (@user.errors[:password].any? ? "password-error" : "password-help"),
+                                   "aria-invalid": (@user.errors[:password].any? ? "true" : "false"),
+                                   class: "relative block w-full border-0 py-1.5 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-400 sm:text-sm sm:leading-6" %>
+            <% if @user.errors[:password].any? %>
+              <p id="password-error" class="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+                <%= @user.errors[:password].first %>
+              </p>
+            <% else %>
+              <p id="password-help" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Password must be at least 8 characters long
+              </p>
+            <% end %>
+          </div>
+          <div>
+            <%= form.label :password_confirmation, "Confirm password", class: "sr-only" %>
+            <%= form.password_field :password_confirmation, 
+                                   autocomplete: "new-password", 
+                                   required: true,
+                                   placeholder: "Confirm password",
+                                   "aria-required": "true",
+                                   "aria-label": "Confirm password",
+                                   "aria-describedby": (@user.errors[:password_confirmation].any? ? "password-confirmation-error" : nil),
+                                   "aria-invalid": (@user.errors[:password_confirmation].any? ? "true" : "false"),
+                                   class: "relative block w-full rounded-b-md border-0 py-1.5 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-400 sm:text-sm sm:leading-6" %>
+            <% if @user.errors[:password_confirmation].any? %>
+              <p id="password-confirmation-error" class="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+                <%= @user.errors[:password_confirmation].first %>
+              </p>
+            <% end %>
+          </div>
         </div>
-        <div>
-          <%= form.label :password, class: "sr-only" %>
-          <%= form.password_field :password, 
-                                 autocomplete: "new-password", 
-                                 required: true,
-                                 placeholder: "Password",
-                                 class: "relative block w-full border-0 py-1.5 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-400 sm:text-sm sm:leading-6" %>
-        </div>
-        <div>
-          <%= form.label :password_confirmation, class: "sr-only" %>
-          <%= form.password_field :password_confirmation, 
-                                 autocomplete: "new-password", 
-                                 required: true,
-                                 placeholder: "Confirm password",
-                                 class: "relative block w-full rounded-b-md border-0 py-1.5 px-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 dark:focus:ring-blue-400 sm:text-sm sm:leading-6" %>
-        </div>
-      </div>
+      </fieldset>
 
       <div>
         <%= form.submit "Sign up", 

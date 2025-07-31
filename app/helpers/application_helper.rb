@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include AccessibilityHelper
   def status_color(status)
     case status
     when 'unread'
@@ -130,15 +131,15 @@ module ApplicationHelper
   def status_badge_class(status)
     case status
     when 'unread'
-      'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+      'status-info'
     when 'read'
-      'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+      'status-success'
     when 'ignored'
-      'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+      'bg-gray-100 dark:bg-gray-700 text-accessible-primary border border-accessible'
     when 'responded'
-      'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
+      'bg-purple-100 dark:bg-purple-900 text-purple-900 dark:text-purple-100 border border-purple-900 dark:border-purple-100'
     else
-      'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+      'bg-gray-100 dark:bg-gray-700 text-accessible-primary border border-accessible'
     end
   end
 
@@ -231,31 +232,30 @@ module ApplicationHelper
 
   # Returns appropriate button size classes for mobile vs desktop
   def mobile_button_classes(style: :primary, size: :md)
-    base_classes = "inline-flex items-center justify-center rounded-lg font-medium transition-colors duration-200"
+    base_classes = "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus-accessible"
     
     # Touch-friendly sizing
     size_classes = case size
-                   when :sm then "px-3 py-2 text-sm"
-                   when :lg then "px-6 py-3 text-base"
-                   else "px-4 py-2.5 text-sm"
+                   when :sm then "px-3 py-2 text-sm min-h-[44px]"
+                   when :lg then "px-6 py-3 text-base min-h-[48px]"
+                   else "px-4 py-2.5 text-sm min-h-[44px]"
                    end
     
-    # Style variants
+    # Style variants using accessible colors
     style_classes = case style
                     when :primary
-                      "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                      "btn-accessible-primary"
                     when :secondary  
-                      "bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
+                      "btn-accessible-secondary"
                     when :danger
-                      "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+                      "bg-red-700 text-white hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-700 border-2 border-red-700 dark:border-red-600"
+                    when :success
+                      "bg-green-700 text-white hover:bg-green-800 dark:bg-green-600 dark:hover:bg-green-700 border-2 border-green-700 dark:border-green-600"
                     else
-                      "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                      "btn-accessible-secondary"
                     end
     
-    # Add touch target requirements
-    touch_classes = touch_target_classes
-    
-    [base_classes, size_classes, style_classes, touch_classes].join(" ")
+    [base_classes, size_classes, style_classes].join(" ")
   end
 
   # Returns classes for mobile-optimized form layouts
@@ -265,17 +265,17 @@ module ApplicationHelper
 
   # Returns label classes optimized for mobile
   def mobile_label_classes
-    "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+    "block text-sm font-medium text-accessible-secondary mb-1"
   end
 
   # Returns help text classes optimized for mobile
   def mobile_help_text_classes  
-    "mt-1 text-sm text-gray-500 dark:text-gray-400"
+    "mt-1 text-sm text-accessible-muted"
   end
 
   # Returns error text classes optimized for mobile
   def mobile_error_classes
-    "mt-1 text-sm text-red-600 dark:text-red-400"
+    "mt-1 text-sm text-red-700 dark:text-red-300"
   end
 
   # Helper method for the existing normalize_sources_param method

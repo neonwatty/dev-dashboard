@@ -14,6 +14,9 @@ class FormFieldComponent < MobileResponsiveComponent
     help_text: nil,
     error: nil,
     options: [],
+    autocomplete: nil,
+    fieldset: false,
+    legend: nil,
     **attributes
   )
     @label = label
@@ -26,12 +29,15 @@ class FormFieldComponent < MobileResponsiveComponent
     @help_text = help_text
     @error = error
     @options = options
+    @autocomplete = autocomplete
+    @fieldset = fieldset
+    @legend = legend
     @attributes = attributes
   end
 
   private
 
-  attr_reader :label, :field_type, :name, :id, :value, :placeholder, :required, :help_text, :error, :options, :attributes
+  attr_reader :label, :field_type, :name, :id, :value, :placeholder, :required, :help_text, :error, :options, :autocomplete, :fieldset, :legend, :attributes
 
   def field_wrapper_classes
     mobile_form_classes
@@ -70,7 +76,7 @@ class FormFieldComponent < MobileResponsiveComponent
 
   def required_indicator
     return "" unless required
-    '<span class="text-red-500 ml-1">*</span>'.html_safe
+    '<span class="text-red-500 ml-1" aria-hidden="true">*</span>'.html_safe
   end
 
   def field_attributes
@@ -78,11 +84,22 @@ class FormFieldComponent < MobileResponsiveComponent
       class: field_classes,
       id: id,
       name: name,
-      required: required
+      required: required,
+      "aria-required" => required.to_s
     }.compact
 
     base_attrs[:placeholder] = placeholder if placeholder.present?
     base_attrs[:value] = value if value.present? && !%i[select checkbox radio].include?(field_type)
+    base_attrs[:autocomplete] = autocomplete if autocomplete.present?
+    
+    # Add aria-describedby for help text and errors
+    described_by_ids = []
+    described_by_ids << "#{id}_help" if help_text.present?
+    described_by_ids << "#{id}_error" if error.present?
+    base_attrs["aria-describedby"] = described_by_ids.join(" ") if described_by_ids.any?
+    
+    # Add aria-invalid for error state
+    base_attrs["aria-invalid"] = "true" if error.present?
     
     base_attrs.merge(attributes)
   end
@@ -140,7 +157,7 @@ class FormFieldComponent < MobileResponsiveComponent
     content_tag(:div, wrapper_attrs) do
       [
         tag.input(**checkbox_attrs),
-        content_tag(:label, label, for: id, class: "text-sm font-medium text-gray-900 dark:text-gray-300")
+        content_tag(:label, label + required_indicator, for: id, class: "text-sm font-medium text-gray-900 dark:text-gray-300")
       ].join.html_safe
     end
   end
@@ -210,5 +227,21 @@ class FormFieldComponent < MobileResponsiveComponent
 
   def show_error?
     error.present?
+  end
+
+  def help_text_id
+    "#{id}_help"
+  end
+
+  def error_id
+    "#{id}_error"
+  end
+
+  def use_fieldset?
+    fieldset || field_type == :radio
+  end
+
+  def get_legend
+    legend || (field_type == :radio ? label : nil)
   end
 end
