@@ -41,9 +41,24 @@ class MobileResponsiveComponent < ViewComponent::Base
   end
 
   # Returns touch-friendly target classes
-  # Ensures minimum 44px touch targets on mobile, 48px on very small screens
+  # Ensures minimum 44px touch targets on mobile, with proper spacing
   def touch_target_classes
-    "min-h-[44px] min-w-[44px] max-[768px]:min-h-[48px] max-[768px]:min-w-[48px] flex items-center justify-center"
+    "min-h-[44px] min-w-[44px] touch-target flex items-center justify-center"
+  end
+
+  # Returns enhanced touch target classes with spacing
+  def enhanced_touch_target_classes
+    "min-h-[44px] min-w-[44px] touch-target touch-safe-spacing flex items-center justify-center"
+  end
+
+  # Returns classes for touch-safe horizontal layouts
+  def touch_safe_horizontal_classes
+    "flex items-center touch-safe-horizontal"
+  end
+
+  # Returns classes for touch-safe vertical layouts  
+  def touch_safe_vertical_classes
+    "flex flex-col touch-safe-vertical"
   end
 
   # Returns mobile-first text size classes

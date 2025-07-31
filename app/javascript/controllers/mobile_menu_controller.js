@@ -40,7 +40,18 @@ export default class extends Controller {
     
     // Ensure menu is closed on initialization
     this.isOpen = false
-    this.closeMenu()
+    // Don't call closeMenu() here, just ensure correct initial classes
+    if (this.hasDrawerTarget) {
+      this.drawerTarget.classList.add("closed")
+      this.drawerTarget.classList.remove("open")
+    }
+    if (this.hasBackdropTarget) {
+      this.backdropTarget.classList.add("hidden")
+      this.backdropTarget.classList.remove("visible")
+    }
+    if (this.hasHamburgerTarget) {
+      this.hamburgerTarget.classList.remove("open")
+    }
     
     // Add resize listener for responsive behavior
     window.addEventListener("resize", this.handleResize)
@@ -150,13 +161,11 @@ export default class extends Controller {
     // Toggle drawer visibility
     if (this.hasDrawerTarget) {
       if (isOpen) {
-        // Show drawer
-        this.drawerTarget.classList.remove("hidden")
+        // Show drawer - don't use hidden class since CSS uses transform
         this.drawerTarget.classList.add("open")
         this.drawerTarget.classList.remove("closed")
       } else {
-        // Hide drawer
-        this.drawerTarget.classList.add("hidden")
+        // Hide drawer - don't use hidden class since CSS uses transform
         this.drawerTarget.classList.add("closed")
         this.drawerTarget.classList.remove("open")
       }

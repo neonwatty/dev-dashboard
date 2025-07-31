@@ -81,6 +81,15 @@ github_trending_weekly:
   last_fetched_at: <%= 1.hour.ago %>
   status: ok
 
+huggingface_forum:
+  name: HuggingFace Forum Alternative
+  source_type: discourse
+  url: https://discuss.huggingface.co/alternative
+  config: '{}'
+  active: true
+  last_fetched_at: <%= 1.hour.ago %>
+  status: ok
+
 github_trending_inactive:
   name: GitHub Trending Inactive
   source_type: github_trending

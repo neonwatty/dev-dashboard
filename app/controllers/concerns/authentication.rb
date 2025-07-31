@@ -31,7 +31,13 @@ module Authentication
 
     def request_authentication
       session[:return_to_after_authenticating] = request.url
-      redirect_to new_session_path
+      set_authentication_required_message
+      
+      respond_to do |format|
+        format.html { redirect_to new_session_path }
+        format.turbo_stream { redirect_to new_session_path }
+        format.json { render json: { error: "Authentication required" }, status: :unauthorized }
+      end
     end
 
     def after_authentication_url
@@ -48,5 +54,36 @@ module Authentication
     def terminate_session
       Current.session.destroy
       cookies.delete(:session_id)
+    end
+
+    def set_authentication_required_message
+      feature_name = get_feature_name_from_request
+      session[:auth_required_info] = {
+        message: "Authentication required to access #{feature_name}",
+        feature: feature_name,
+        return_url: request.url
+      }
+    end
+
+    def get_feature_name_from_request
+      case request.path
+      when /^\/sources/
+        case request.path
+        when /\/sources\/new/
+          "Source Creation"
+        when /\/sources\/\d+\/edit/
+          "Source Editing"
+        when /\/sources$/
+          "Sources Management"
+        else
+          "Sources"
+        end
+      when /^\/analysis/
+        "Analytics Dashboard"
+      when /^\/settings/
+        "Account Settings"
+      else
+        "this feature"
+      end
     end
 end

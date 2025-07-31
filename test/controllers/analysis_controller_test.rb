@@ -7,9 +7,16 @@ class AnalysisControllerTest < ActionDispatch::IntegrationTest
     Post.destroy_all
   end
 
-  test "should redirect to login when not authenticated" do
+  test "should redirect to login when not authenticated and show auth required message" do
     get analysis_url
     assert_redirected_to new_session_url
+    follow_redirect!
+    
+    assert_select 'div.bg-blue-50'
+    assert response.body.include?("Authentication Required"), "Should display authentication required header"
+    assert response.body.include?("Analytics Dashboard"), "Should mention Analytics Dashboard in the message"
+    assert_select 'button[form="sign-in-form"]', text: 'Sign In Now'
+    assert_select 'a[href="/"]', text: 'Learn More'
   end
 
   test "should get index when authenticated" do

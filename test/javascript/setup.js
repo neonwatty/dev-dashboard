@@ -44,6 +44,17 @@ Object.defineProperty(performance, 'memory', {
 // Mock window.navigator.vibrate for haptic tests
 global.navigator.vibrate = jest.fn()
 
+// Mock HapticFeedback for touch feedback tests
+global.HapticFeedback = {
+  light: jest.fn(),
+  medium: jest.fn(),
+  heavy: jest.fn(),
+  selection: jest.fn(),
+  success: jest.fn(),
+  warning: jest.fn(),
+  error: jest.fn()
+}
+
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
   constructor() {}

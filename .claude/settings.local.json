@@ -81,7 +81,9 @@
       "Bash(mv:*)",
       "Bash(node:*)",
       "Bash(bundle exec ruby:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(mcp list:*)",
+      "Bash(RAILS_ENV=test bundle exec rails db:migrate)"
     ],
     "deny": []
   }
