@@ -23,7 +23,7 @@ export class TestHelpers {
    * Authenticate user for tests that require login
    */
   async authenticateUser(email = 'user@example.com', password = 'password') {
-    await this.page.goto('/sessions/new');
+    await this.page.goto('/session/new');
     await this.page.fill('input[name="email_address"]', email);
     await this.page.fill('input[name="password"]', password);
     await this.page.click('button[type="submit"]');

@@ -188,11 +188,6 @@
   touch-action: pan-y; /* Allow vertical scrolling but prevent horizontal scrolling */
 }
 
-/* Closed state - use transform instead of display */
-.mobile-drawer.closed {
-  transform: translateX(100%) !important;
-}
-
 /* Dark mode drawer */
 .dark .mobile-drawer {
   background-color: #1f2937;
@@ -201,6 +196,11 @@
 /* Open state */
 .mobile-drawer.open {
   transform: translateX(0);
+}
+
+/* Closed state - completely hide the drawer (must come after base rule) */
+.mobile-drawer.closed {
+  display: none !important;
 }
 
 /* Swipe-specific styles for smooth interactions */

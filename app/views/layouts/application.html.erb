@@ -23,6 +23,13 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= vite_client_tag %>
     <%= vite_javascript_tag 'application' %>
+    
+    <!-- Temporary CSS fix for mobile drawer -->
+    <style>
+      .mobile-drawer.closed {
+        display: none !important;
+      }
+    </style>
   </head>
 
   <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200" data-controller="mobile-menu screen-reader keyboard-shortcuts" data-keyboard-shortcuts-enabled-value="<%= authenticated? && Current.user&.settings&.keyboard_shortcuts_enabled != false %>">
@@ -114,7 +121,7 @@
     <!-- Mobile Navigation Backdrop -->
     <div class="mobile-backdrop hidden" 
          data-mobile-menu-target="backdrop"
-         data-action="click->mobile-menu#close">
+         data-action="click->mobile-menu#backdropClicked">
     </div>
     
     <!-- Mobile Navigation Drawer -->
@@ -122,6 +129,7 @@
          data-mobile-menu-target="drawer"
          role="dialog"
          aria-modal="true"
+         aria-hidden="true"
          aria-labelledby="mobile-nav-title">
       <div class="mobile-nav-content">
         <!-- Mobile Nav Header -->

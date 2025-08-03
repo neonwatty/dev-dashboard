@@ -332,10 +332,9 @@ export default class extends Controller {
   
   // Handle backdrop click to close menu
   backdropClicked(event) {
-    // Only close if clicking directly on backdrop, not on child elements
-    if (event.target === this.backdropTarget) {
-      this.closeMenu()
-    }
+    // Close menu on any backdrop click - the backdrop shouldn't have child elements
+    console.log("📱 Backdrop clicked, closing menu")
+    this.closeMenu()
   }
   
   // Handle resize events (optional - for responsive behavior)
