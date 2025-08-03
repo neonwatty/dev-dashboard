@@ -42,7 +42,21 @@
       "Bash(eslint:*)",
       "Bash(ps:*)",
       "Bash(echo:*)",
-      "Bash(DISABLE_SPRING=1 bundle exec rails test test/models/context_item_test.rb)"
+      "Bash(DISABLE_SPRING=1 bundle exec rails test test/models/context_item_test.rb)",
+      "Bash(npx:*)",
+      "Bash(playwright:*)",
+      "Bash(nohup:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_resize",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_close"
     ],
     "deny": [
       "Bash(rm -rf:*)",
