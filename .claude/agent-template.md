@@ -38,7 +38,7 @@ color: color-name
 - Format of deliverables
 - Quality standards met
 
-**Completion Report**: Uses standard JSON protocol (see `.claude/communication-protocol.md`)
+**Completion Report**: Includes structured handoff information in response
 
 ## Communication Protocol
 

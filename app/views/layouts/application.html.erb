@@ -45,23 +45,23 @@
           <div class="flex items-center">
             <%= link_to root_path, class: "flex-shrink-0 flex items-center group" do %>
               <%= render IconComponent.new(name: :dashboard, size: :xl, css_class: "md:w-8 md:h-8 text-blue-600 dark:text-blue-400 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors") %>
-              <span class="ml-2 text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors hidden min-[360px]:inline">Dev Dashboard</span>
+              <span class="ml-2 text-base min-[360px]:text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors hidden min-[340px]:inline">Dev Dashboard</span>
             <% end %>
-            </div>
-            <!-- Desktop Navigation -->
-            <div class="hidden md:ml-10 md:flex md:space-x-8">
-              <%= link_to "Dashboard", root_path, class: "#{current_page?(root_path) ? 'border-blue-500 text-gray-900 dark:text-gray-100' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors touch-target" %>
-              <%= link_to "Sources", sources_path, class: "#{current_page?(sources_path) ? 'border-blue-500 text-gray-900 dark:text-gray-100' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors touch-target" %>
-              <% if authenticated? %>
-                <%= link_to "Analysis", analysis_path, class: "#{current_page?(analysis_path) ? 'border-blue-500 text-gray-900 dark:text-gray-100' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors touch-target" %>
-              <% end %>
-            </div>
+          </div>
+          
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex md:items-center md:space-x-8 lg:space-x-10">
+            <%= link_to "Dashboard", root_path, class: "#{current_page?(root_path) ? 'border-blue-500 text-gray-900 dark:text-gray-100' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'} inline-flex items-center px-2 pt-1 border-b-2 text-sm font-medium transition-all duration-200 touch-target hover:scale-105" %>
+            <%= link_to "Sources", sources_path, class: "#{current_page?(sources_path) ? 'border-blue-500 text-gray-900 dark:text-gray-100' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'} inline-flex items-center px-2 pt-1 border-b-2 text-sm font-medium transition-all duration-200 touch-target hover:scale-105" %>
+            <% if authenticated? %>
+              <%= link_to "Analysis", analysis_path, class: "#{current_page?(analysis_path) ? 'border-blue-500 text-gray-900 dark:text-gray-100' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'} inline-flex items-center px-2 pt-1 border-b-2 text-sm font-medium transition-all duration-200 touch-target hover:scale-105" %>
+            <% end %>
           </div>
           
           <!-- Mobile Menu Button & Desktop Controls -->
-          <div class="flex items-center space-x-2 md:space-x-4">
+          <div class="flex items-center space-x-2 md:space-x-4 lg:space-x-6">
             <!-- Desktop Stats (hidden on mobile) -->
-            <div class="hidden md:flex items-center space-x-4">
+            <div class="hidden md:flex items-center space-x-4 lg:space-x-6">
               <span class="text-sm text-gray-500 dark:text-gray-400" id="post-count">Posts: <%= Post.where.not(status: 'ignored').count %></span>
               <span class="text-sm text-gray-500 dark:text-gray-400">Sources: <%= Source.active.count %></span>
             </div>
@@ -78,7 +78,7 @@
             
             <!-- Desktop Auth (hidden on mobile) -->
             <% if authenticated? %>
-              <div class="hidden md:flex items-center space-x-4">
+              <div class="hidden md:flex items-center space-x-3 lg:space-x-4">
                 <span class="text-sm text-gray-700 dark:text-gray-300"><%= Current.user&.email_address %></span>
                 <%= link_to "Settings", edit_settings_path, 
                           class: "text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors touch-target" %>
@@ -86,7 +86,7 @@
                             class: "text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors touch-target" %>
               </div>
             <% else %>
-              <div class="hidden md:flex items-center space-x-2">
+              <div class="hidden md:flex items-center space-x-2 lg:space-x-3">
                 <%= link_to "Sign in", new_session_path, 
                           class: "text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors touch-target" %>
                 <%= link_to "Sign up", new_registration_path,
@@ -227,32 +227,7 @@
       <%= yield %>
     </main>
 
-    <!-- Bottom Navigation (Mobile Only) -->
-    <nav class="md:hidden bottom-nav">
-      <div class="grid grid-cols-3 divide-x divide-gray-200 dark:divide-gray-700">
-        <%= link_to root_path, class: "bottom-nav-item #{current_page?(root_path) ? 'active' : ''}" do %>
-          <%= render IconComponent.new(name: :dashboard, size: :lg, css_class: "mb-1") %>
-          <span>Dashboard</span>
-        <% end %>
-        
-        <%= link_to sources_path, class: "bottom-nav-item #{current_page?(sources_path) ? 'active' : ''}" do %>
-          <%= render IconComponent.new(name: :sources, size: :lg, css_class: "mb-1") %>
-          <span>Sources</span>
-        <% end %>
-        
-        <% if authenticated? %>
-          <%= link_to analysis_path, class: "bottom-nav-item #{current_page?(analysis_path) ? 'active' : ''}" do %>
-            <%= render IconComponent.new(name: :analytics, size: :lg, css_class: "mb-1") %>
-            <span>Analysis</span>
-          <% end %>
-        <% else %>
-          <%= link_to new_session_path, class: "bottom-nav-item" do %>
-            <%= render IconComponent.new(name: :login, size: :lg, css_class: "mb-1") %>
-            <span>Sign in</span>
-          <% end %>
-        <% end %>
-      </div>
-    </nav>
+    <!-- Bottom Navigation (Disabled - using mobile drawer instead) -->
 
     <!-- Footer with Full-Width Background and Constrained Content -->
     <footer class="section-full-width bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto transition-colors duration-200">

@@ -11,6 +11,7 @@
     "test:coverage": "jest --coverage"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
     "babel-jest": "^29.7.0",

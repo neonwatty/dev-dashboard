@@ -3,41 +3,32 @@
 ## Quick Start
 
 1. **Simple Tasks** → Direct to specialist agent
-2. **Complex Tasks** → Use `project-orchestrator` 
+2. **Complex Tasks** → Use `project-orchestrator` (Planning Mode)
 3. **Errors** → Auto-escalate to `error-debugger`
 
 ## Agent Reference
 
 | Agent | Use For | Trigger Keywords |
 |-------|---------|------------------|
-| 🚂 `ruby-rails-expert` | Rails models, controllers, migrations | rails, model, controller, activerecord |
-| 📦 `javascript-package-expert` | npm/yarn, JS/TS code, Stimulus | npm, javascript, package, stimulus |
+| 🚂 `ruby-rails-expert` | Rails + Ruby linting (RuboCop) | rails, model, controller, activerecord, rubocop, lint |
+| 📦 `javascript-package-expert` | JS/TS + npm + JS linting (ESLint) | npm, javascript, package, stimulus, eslint, lint |
 | 🎨 `tailwind-css-expert` | Styling, UI, responsive design | css, tailwind, styling, ui |
 | 🧪 `test-runner-fixer` | Write/fix tests, coverage | test, spec, rspec, coverage |
 | 🐛 `error-debugger` | Debug errors, performance | error, bug, failing, debug |
-| 📋 `project-orchestrator` | Planning, coordination | plan, coordinate, complex |
+| 📋 `project-orchestrator` | Planning, coordination, todo lists | plan, coordinate, complex, todo, strategy |
 | 🔀 `git-auto-commit` | Create commits | commit, save changes |
 
 ## Workflow
 
 See visual workflow: [workflow-diagram.md](.claude/workflow-diagram.md)
 
-## Communication Protocol
+## Agent Communication
 
-All agents use standardized JSON protocol: [communication-protocol.md](.claude/communication-protocol.md)
+Agents communicate through structured completion reports embedded in their responses. Each agent knows when to hand off work to the next appropriate agent.
 
 ## Router Configuration
 
 Automatic agent selection rules: [router.yaml](.claude/router.yaml)
-
-## Task Master Integration
-
-**Import Task Master commands:**
-@./.taskmaster/CLAUDE.md
-
-All agents automatically:
-- Update task status via `mcp__task-master-ai__set_task_status`
-- Log progress via `mcp__task-master-ai__update_subtask`
 
 ## Starting Complex Tasks
 
@@ -71,13 +62,65 @@ Automatic escalation chain:
 3. Escalate to `project-orchestrator`
 4. Replan and reassign
 
+## Planning Protocol
+
+**MANDATORY: All complex tasks must begin with proper planning**
+
+1. **Planning Requirement**: Any task involving multiple steps, agents, or phases MUST start with project-orchestrator in Planning Mode
+2. **Plan Storage**: All plans MUST be saved to `@plans/[feature-name]/README.md` before execution
+3. **Todo Tracking**: Use TodoWrite tool to create actionable, trackable task lists
+4. **Execution Flow**: 
+   - User request → project-orchestrator analyzes complexity
+   - Complex task → Planning Mode creates plan
+   - Plan saved to @plans/ directory
+   - TodoWrite creates task list
+   - Execution Mode runs plan
+   - Progress tracked via Task Master
+
+### Plan Structure Requirements
+
+Every plan must include:
+- Clear objectives and success criteria
+- Actionable todo list with agent assignments
+- Test-Driven Development (TDD) approach
+- Linting and code quality phases
+- Implementation phases with timelines
+- Risk assessment and mitigation
+- Automatic execution command
+
+### TDD and Code Quality Protocol
+
+1. **Test First**: All new features MUST start with failing tests
+2. **Implementation**: Code only to make tests pass
+3. **Linting**: Run appropriate linters after each implementation:
+   - Ruby: `ruby-rails-expert` (includes RuboCop)
+   - JavaScript: `javascript-package-expert` (includes ESLint)
+4. **Quality Gates**: No phase proceeds with failing tests or linting errors
+
+### Planning Workflow Example
+
+```bash
+# For any complex feature request:
+Task(description="Implement [feature]",
+     subagent_type="project-orchestrator",
+     prompt="[Detailed requirements] - Create plan and execute with automatic handoffs")
+
+# Or if plan already exists:
+Task(description="Execute [feature] plan",
+     subagent_type="project-orchestrator", 
+     prompt="Execute plan at plans/[feature-name]/README.md")
+```
+
 ## Best Practices
 
+- Always start complex tasks with project-orchestrator (Planning Mode)
 - Let orchestrator handle multi-domain tasks
+- Linting is integrated with language experts (not separate agents)
 - Trust automatic handoffs
 - Check Task Master for progress
 - Agents complete work before handoff
 - Use structured completion reports
+- Document all plans in @plans/ directory
 
 ## Important Instructions
 
@@ -85,5 +128,6 @@ Automatic escalation chain:
 - Never create files unless necessary
 - Always prefer editing existing files
 - No unsolicited documentation creation
+- ALWAYS plan before executing complex tasks
 
 For detailed agent capabilities, see individual agent files in `.claude/agents/`

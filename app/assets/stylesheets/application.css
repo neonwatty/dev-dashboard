@@ -190,7 +190,7 @@
 
 /* Closed state - use transform instead of display */
 .mobile-drawer.closed {
-  transform: translateX(100%);
+  transform: translateX(100%) !important;
 }
 
 /* Dark mode drawer */
