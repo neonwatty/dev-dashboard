@@ -11,13 +11,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get show" do
-    get post_url(posts(:one))
+    get post_url(posts(:huggingface_post))
     assert_response :success
   end
 
   test "should mark post as read" do
     sign_in_as(@user)
-    post = posts(:one)
+    post = posts(:huggingface_post)
     assert_equal 'unread', post.status
     
     patch mark_as_read_post_url(post)
@@ -29,7 +29,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
   test "should mark post as ignored" do
     sign_in_as(@user)
-    post = posts(:one)
+    post = posts(:huggingface_post)
     
     patch mark_as_ignored_post_url(post)
     assert_redirected_to posts_url
@@ -40,7 +40,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
   test "should mark post as responded" do
     sign_in_as(@user)
-    post = posts(:one)
+    post = posts(:huggingface_post)
     
     patch mark_as_responded_post_url(post)
     assert_redirected_to posts_url
@@ -136,7 +136,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       title: 'Old Post',
       url: 'https://example.com/old',
       author: 'Test',
-      posted_at: 2.hours.ago,
+      posted_at: 2.days.ago,
       status: 'unread'
     )
     
@@ -182,7 +182,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       title: 'High Priority Post',
       url: 'https://example.com/high',
       author: 'Test',
-      posted_at: 2.hours.ago,
+      posted_at: 2.days.ago,
       status: 'unread',
       priority_score: 10.0
     )
@@ -207,7 +207,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       title: 'Old Post 2',
       url: 'https://example.com/old2',
       author: 'Test',
-      posted_at: 3.hours.ago,
+      posted_at: 3.days.ago,
       status: 'unread'
     )
     

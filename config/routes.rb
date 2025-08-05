@@ -4,7 +4,6 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
   resources :registrations, only: [:new, :create]
-  resource :settings, only: [:edit, :update]
   resources :posts, only: [:index, :show] do
     member do
       patch :mark_as_read
@@ -25,7 +24,6 @@ Rails.application.routes.draw do
   end
   
   get "analysis", to: "analysis#index", as: :analysis
-  get "touch_demo", to: "pages#touch_demo", as: :touch_demo
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

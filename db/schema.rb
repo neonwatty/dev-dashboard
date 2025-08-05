@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_31_192233) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_12_132042) do
   create_table "posts", force: :cascade do |t|
     t.string "source"
     t.string "external_id"
@@ -50,15 +50,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_31_192233) do
     t.index ["url"], name: "index_sources_on_url", unique: true
   end
 
-  create_table "user_settings", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "post_retention_days", default: 30, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "keyboard_shortcuts_enabled", default: true, null: false
-    t.index ["user_id"], name: "index_user_settings_on_user_id", unique: true
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "email_address", null: false
     t.string "password_digest", null: false
@@ -68,5 +59,4 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_31_192233) do
   end
 
   add_foreign_key "sessions", "users"
-  add_foreign_key "user_settings", "users"
 end

@@ -1,43 +1,42 @@
 <%= turbo_stream_from "source_status:all" %>
 
-<div class="responsive-container mobile-padding py-8">
-  <div class="mb-6">
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Sources</h1>
-      <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
-        <%= link_to "Dashboard", root_path, class: "bg-gray-500 dark:bg-gray-600 hover:bg-gray-700 dark:hover:bg-gray-500 text-white font-bold py-3 px-4 rounded-md text-center touch-target" %>
-        <%= button_to refresh_all_sources_path, 
-                     method: :post, 
-                     data: { turbo_confirm: "This will refresh all active sources. Continue?" },
-                     class: "bg-green-500 dark:bg-green-600 hover:bg-green-700 dark:hover:bg-green-500 text-white font-bold py-3 px-4 rounded-md flex items-center justify-center touch-target" do %>
-          <%= render IconComponent.new(name: :refresh, size: :sm, css_class: "mr-2") %>
-          <span class="hidden sm:inline">Refresh All Active</span>
-          <span class="sm:hidden">Refresh All</span>
-        <% end %>
-        <%= link_to "Add New Source", new_source_path, class: "bg-blue-500 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-md text-center touch-target" %>
-      </div>
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Sources</h1>
+    <div class="flex space-x-4">
+      <%= link_to "Dashboard", root_path, class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
+      <%= button_to refresh_all_sources_path, 
+                   method: :post, 
+                   data: { turbo_confirm: "This will refresh all active sources. Continue?" },
+                   class: "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded flex items-center" do %>
+        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Refresh All Active
+      <% end %>
+      <%= link_to "Add New Source", new_source_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
     </div>
   </div>
 
   <!-- Responsive Table Container -->
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <% if @sources.any? %>
       <!-- Desktop View -->
       <div class="hidden lg:block overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-700">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
             <tr>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Source</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">URL</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Fetched</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Settings</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Fetched</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Settings</th>
+              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody class="bg-white divide-y divide-gray-200">
             <% @sources.each do |source| %>
-              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+              <tr class="hover:bg-gray-50">
                 <!-- Source Info -->
                 <td class="px-4 py-4">
                   <div class="flex items-center">
@@ -45,8 +44,8 @@
                       <%= render "posts/source_icon", source: source.name %>
                     </div>
                     <div>
-                      <%= link_to source.name, source, class: "text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
-                      <div class="text-xs text-gray-500 dark:text-gray-400"><%= source.source_type.humanize %></div>
+                      <%= link_to source.name, source, class: "text-sm font-medium text-blue-600 hover:text-blue-900" %>
+                      <div class="text-xs text-gray-500"><%= source.source_type.humanize %></div>
                     </div>
                   </div>
                 </td>
@@ -54,11 +53,11 @@
                 <!-- URL -->
                 <td class="px-4 py-4 max-w-xs">
                   <% if source.url.present? %>
-                    <div class="text-sm text-gray-900 dark:text-gray-100 truncate" title="<%= source.url %>">
-                      <%= link_to source.url.gsub(/^https?:\/\//, ''), source.url, target: "_blank", class: "text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300" %>
+                    <div class="text-sm text-gray-900 truncate" title="<%= source.url %>">
+                      <%= link_to source.url.gsub(/^https?:\/\//, ''), source.url, target: "_blank", class: "text-blue-600 hover:text-blue-900" %>
                     </div>
                   <% else %>
-                    <span class="text-xs text-gray-400 dark:text-gray-500 italic">No URL (API-based)</span>
+                    <span class="text-xs text-gray-400 italic">No URL (API-based)</span>
                   <% end %>
                 </td>
                 
@@ -68,7 +67,7 @@
                 </td>
                 
                 <!-- Last Fetched -->
-                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                   <%= source.last_fetched_at ? time_ago_in_words(source.last_fetched_at) + " ago" : "Never" %>
                 </td>
                 
@@ -76,19 +75,25 @@
                 <td class="px-4 py-4 whitespace-nowrap">
                   <div class="flex items-center space-x-2">
                     <% if source.active? %>
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                        <%= render IconComponent.new(name: :check_circle_filled, size: :xs, css_class: "mr-1", fill: "currentColor", stroke: "none") %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
                         Active
                       </span>
                     <% else %>
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                        <%= render IconComponent.new(name: :x_circle_filled, size: :xs, css_class: "mr-1", fill: "currentColor", stroke: "none") %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
                         Inactive
                       </span>
                     <% end %>
                     <% if source.auto_fetch_enabled? %>
-                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200" title="Auto-fetch enabled">
-                        <%= render IconComponent.new(name: :refresh_filled, size: :xs, fill: "currentColor", stroke: "none") %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800" title="Auto-fetch enabled">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                        </svg>
                       </span>
                     <% end %>
                   </div>
@@ -99,28 +104,36 @@
                   <div class="flex items-center space-x-1">
                     <%= button_to test_connection_source_path(source), 
                                  method: :post, 
-                                 class: "p-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded transition-colors",
+                                 class: "p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded transition-colors",
                                  title: "Test connection" do %>
-                      <%= render IconComponent.new(name: :check_circle, size: :sm) %>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
                     <% end %>
                     <%= button_to refresh_source_path(source), 
                                  method: :post, 
-                                 class: "p-1.5 text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/50 rounded transition-colors",
+                                 class: "p-1.5 text-green-600 hover:text-green-900 hover:bg-green-50 rounded transition-colors",
                                  title: "Refresh",
                                  data: { disable_with: "..." } do %>
-                      <%= render IconComponent.new(name: :refresh, size: :sm) %>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                      </svg>
                     <% end %>
                     <%= link_to edit_source_path(source), 
-                                class: "p-1.5 text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/50 rounded transition-colors",
+                                class: "p-1.5 text-yellow-600 hover:text-yellow-900 hover:bg-yellow-50 rounded transition-colors",
                                 title: "Edit" do %>
-                      <%= render IconComponent.new(name: :edit, size: :sm) %>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
                     <% end %>
                     <%= button_to source, 
                                  method: :delete, 
                                  data: { turbo_confirm: "Are you sure?" }, 
-                                 class: "p-1.5 text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/50 rounded transition-colors",
+                                 class: "p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded transition-colors",
                                  title: "Delete" do %>
-                      <%= render IconComponent.new(name: :trash, size: :sm) %>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
                     <% end %>
                   </div>
                 </td>
@@ -131,117 +144,66 @@
       </div>
 
       <!-- Mobile/Tablet Card View -->
-      <div class="lg:hidden space-y-4 p-4">
+      <div class="lg:hidden">
         <% @sources.each do |source| %>
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-            <!-- Header with icon and name -->
-            <div class="flex items-start justify-between mb-3">
-              <div class="flex items-center gap-3 flex-1 min-w-0">
-                <div class="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center <%= source_icon_bg_class(source.name) %>">
+          <div class="border-b border-gray-200 p-4">
+            <div class="flex items-start justify-between">
+              <div class="flex items-center space-x-3 flex-1">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center <%= source_icon_bg_class(source.name) %>">
                   <%= render "posts/source_icon", source: source.name %>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <%= link_to source.name, source, class: "text-lg font-medium text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 block truncate" %>
-                  <div class="text-sm text-gray-500 dark:text-gray-400"><%= source.source_type.humanize %></div>
+                  <%= link_to source.name, source, class: "text-lg font-medium text-blue-600 hover:text-blue-900" %>
+                  <div class="text-sm text-gray-500"><%= source.source_type.humanize %></div>
+                  <% if source.url.present? %>
+                    <div class="text-xs text-gray-400 truncate mt-1" title="<%= source.url %>">
+                      <%= source.url.gsub(/^https?:\/\//, '') %>
+                    </div>
+                  <% end %>
                 </div>
               </div>
               
-              <!-- Action buttons -->
-              <div class="flex items-center gap-1 ml-2">
-                <%= button_to test_connection_source_path(source), 
-                             method: :post, 
-                             class: "p-2.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-lg touch-target",
-                             title: "Test connection" do %>
-                  <%= render IconComponent.new(name: :check_circle, size: :md) %>
-                <% end %>
+              <div class="flex items-center space-x-1 ml-2">
                 <%= button_to refresh_source_path(source), 
                              method: :post, 
-                             class: "p-2.5 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/50 rounded-lg touch-target",
-                             title: "Refresh",
+                             class: "p-2 text-green-600 hover:bg-green-50 rounded",
                              data: { disable_with: "..." } do %>
-                  <%= render IconComponent.new(name: :refresh, size: :md) %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                  </svg>
                 <% end %>
-                <%= link_to edit_source_path(source), 
-                            class: "p-2.5 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-900/50 rounded-lg touch-target",
-                            title: "Edit" do %>
-                  <%= render IconComponent.new(name: :edit, size: :md) %>
+                <%= link_to edit_source_path(source), class: "p-2 text-blue-600 hover:bg-blue-50 rounded" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
                 <% end %>
               </div>
             </div>
             
-            <!-- URL (if present) -->
-            <% if source.url.present? %>
-              <div class="mb-3">
-                <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">URL</dt>
-                <dd class="text-sm text-gray-700 dark:text-gray-300 break-all">
-                  <%= link_to source.url.gsub(/^https?:\/\//, ''), source.url, target: "_blank", class: "text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" %>
-                </dd>
+            <div class="mt-3 flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <%= render 'status_badge', source: source %>
+                <% if source.active? %>
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                <% else %>
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>
+                <% end %>
+                <% if source.auto_fetch_enabled? %>
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Auto-fetch</span>
+                <% end %>
               </div>
-            <% end %>
-            
-            <!-- Details using definition list -->
-            <dl class="space-y-2 mb-4">
-              <div class="flex justify-between items-center">
-                <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</dt>
-                <dd><%= render 'status_badge', source: source %></dd>
+              <div class="text-xs text-gray-500">
+                <%= source.last_fetched_at ? time_ago_in_words(source.last_fetched_at) + " ago" : "Never" %>
               </div>
-              
-              <div class="flex justify-between items-center">
-                <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Active</dt>
-                <dd>
-                  <% if source.active? %>
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                      <%= render IconComponent.new(name: :check_circle_filled, size: :xs, css_class: "mr-1", fill: "currentColor", stroke: "none") %>
-                      Yes
-                    </span>
-                  <% else %>
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                      <%= render IconComponent.new(name: :x_circle_filled, size: :xs, css_class: "mr-1", fill: "currentColor", stroke: "none") %>
-                      No
-                    </span>
-                  <% end %>
-                </dd>
-              </div>
-              
-              <% if source.auto_fetch_enabled? %>
-                <div class="flex justify-between items-center">
-                  <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Auto-fetch</dt>
-                  <dd>
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                      <%= render IconComponent.new(name: :refresh_filled, size: :xs, css_class: "mr-1", fill: "currentColor", stroke: "none") %>
-                      Enabled
-                    </span>
-                  </dd>
-                </div>
-              <% end %>
-              
-              <div class="flex justify-between items-center">
-                <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Last Fetched</dt>
-                <dd class="text-sm text-gray-700 dark:text-gray-300">
-                  <%= source.last_fetched_at ? time_ago_in_words(source.last_fetched_at) + " ago" : "Never" %>
-                </dd>
-              </div>
-            </dl>
-            
-            <!-- Action buttons footer -->
-            <div class="flex gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
-              <%= link_to "View Details", source, class: "flex-1 text-center py-2.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors touch-target" %>
-              <%= button_to source, 
-                           method: :delete, 
-                           data: { turbo_confirm: "Are you sure?" }, 
-                           class: "flex-1 text-center py-2.5 text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/50 transition-colors touch-target",
-                           title: "Delete" do %>
-                Delete
-              <% end %>
             </div>
           </div>
         <% end %>
       </div>
     <% else %>
       <div class="text-center py-12">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No sources configured</h3>
-        <p class="text-gray-500 dark:text-gray-400 mb-4">Add your first source to start aggregating content</p>
-        <%= link_to "Add New Source", new_source_path, class: "bg-blue-500 dark:bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-500 text-white font-bold py-2 px-4 rounded" %>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No sources configured</h3>
+        <p class="text-gray-500 mb-4">Add your first source to start aggregating content</p>
+        <%= link_to "Add New Source", new_source_path, class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
       </div>
     <% end %>
   </div>

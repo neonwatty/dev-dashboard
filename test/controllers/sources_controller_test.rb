@@ -7,44 +7,6 @@ class SourcesControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(@user)
   end
 
-  test "unauthenticated user gets auth required message for sources index" do
-    sign_out
-    get sources_url
-    
-    assert_redirected_to new_session_path
-    
-    # Check that return URL is set in session
-    assert_equal sources_url, session[:return_to_after_authenticating]
-    
-    follow_redirect!
-    
-    # Verify that the authentication required message is displayed
-    assert_select 'div.bg-blue-50'
-    assert_select 'h3', text: 'Authentication Required'
-    assert response.body.include?("Authentication Required"), "Should display authentication required header"
-    assert response.body.include?("Sign In Now"), "Should contain 'Sign In Now' button"
-    assert response.body.include?("Learn More"), "Should contain 'Learn More' link"
-    assert_select 'button[form="sign-in-form"]', text: 'Sign In Now'
-    assert_select 'a[href="/"]', text: 'Learn More'
-  end
-
-  test "unauthenticated user gets auth required message for sources new" do
-    sign_out  
-    get new_source_url
-    
-    assert_redirected_to new_session_path
-    
-    follow_redirect!
-    
-    # Verify that the authentication required message is displayed
-    assert_select 'div.bg-blue-50'
-    assert_select 'h3', text: 'Authentication Required'
-    assert response.body.include?("Authentication Required"), "Should display authentication required header"
-    assert response.body.include?("Source Creation"), "Should mention Source Creation in the message"
-    assert response.body.include?("Sign In Now"), "Should contain 'Sign In Now' button"
-    assert response.body.include?("Learn More"), "Should contain 'Learn More' link"
-  end
-
   test "should get index" do
     get sources_url
     assert_response :success

@@ -1,133 +1,62 @@
-# Claude Code Agent System
+# CLAUDE.md
 
-## Quick Start
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-1. **Simple Tasks** → Direct to specialist agent
-2. **Complex Tasks** → Use `project-orchestrator` (Planning Mode)
-3. **Errors** → Auto-escalate to `error-debugger`
+## Project Overview
 
-## Agent Reference
+This is a **developer-focused aggregation dashboard** built with Rails 8 + Vite + Tailwind CSS that collects and surfaces new questions, issues, and discussions from various developer communities including:
 
-| Agent | Use For | Trigger Keywords |
-|-------|---------|------------------|
-| 🚂 `ruby-rails-expert` | Rails + Ruby linting (RuboCop) | rails, model, controller, activerecord, rubocop, lint |
-| 📦 `javascript-package-expert` | JS/TS + npm + JS linting (ESLint) | npm, javascript, package, stimulus, eslint, lint |
-| 🎨 `tailwind-css-expert` | Styling, UI, responsive design | css, tailwind, styling, ui |
-| 🧪 `test-runner-fixer` | Write/fix tests, coverage | test, spec, rspec, coverage |
-| 🐛 `error-debugger` | Debug errors, performance | error, bug, failing, debug |
-| 📋 `project-orchestrator` | Planning, coordination, todo lists | plan, coordinate, complex, todo, strategy |
-| 🔀 `git-auto-commit` | Create commits | commit, save changes |
+- Hugging Face and PyTorch forums (Discourse-based)
+- GitHub Issues from specified repositories
+- Hacker News discussions
+- Reddit subreddits
 
-## Workflow
+The goal is to surface opportunities for developers to contribute by answering questions, troubleshooting bugs, or engaging with OSS discussions.
 
-See visual workflow: [workflow-diagram.md](.claude/workflow-diagram.md)
+## Tech Stack
 
-## Agent Communication
+- **Web Framework**: Ruby on Rails 8
+- **JavaScript**: Vite + vite_ruby for asset bundling
+- **Styling**: Tailwind CSS
+- **Database**: SQLite for data persistence
+- **Background Jobs**: In-memory (async) or SQLite-backed ActiveJob queues
+- **LLM Integration**: ruby_llm gem for AI-powered reply suggestions
 
-Agents communicate through structured completion reports embedded in their responses. Each agent knows when to hand off work to the next appropriate agent.
+## Key Architecture Components
 
-## Router Configuration
+### Data Models
+- **Post**: Stores aggregated content from various sources with fields for source, external_id, title, URL, author, tags, status, priority_score, and LLM-generated reply drafts
+- **Source**: Manages different data sources (GitHub repos, forums, RSS feeds) with configuration, credentials, and connection status
 
-Automatic agent selection rules: [router.yaml](.claude/router.yaml)
+### Background Jobs
+- Source-specific fetch jobs for each platform (Hugging Face, PyTorch, GitHub, Hacker News, Reddit)
+- `SuggestPostReplyJob`: Uses LLM to generate draft responses
+- `ScorePostsJob`: Computes relevance/urgency scores for posts
 
-## Starting Complex Tasks
+### LLM Integration
+- Uses `ruby_llm` gem for multi-provider LLM support (OpenAI, Anthropic, Ollama, Hugging Face, AWS Bedrock)
+- Generates helpful reply suggestions for community posts
+- Provider selection is configurable per source or user
 
-```bash
-Task(description="Brief description",
-     subagent_type="project-orchestrator", 
-     prompt="Create automatic workflow for: [detailed requirements]")
-```
+## Development Status
 
-The orchestrator will:
-1. Analyze requirements
-2. Create delegation plan
-3. Launch specialist agents
-4. Monitor progress
-5. Handle errors/escalations
-6. Trigger git commit when complete
+**Current State**: This appears to be a new project with only basic documentation. The actual Rails application has not been scaffolded yet.
 
-## Agent Communication Flow
+**Next Steps (based on PRD)**:
+1. Scaffold Rails 8 app with Vite + Tailwind
+2. Create Post and Source models
+3. Implement data fetching for Hugging Face and PyTorch forums
+4. Build basic feed UI with filtering capabilities
 
-```
-User Request → Analyze → Route to Agent → Execute → Report → Next Agent/Complete
-                  ↓
-              [Complex?] → project-orchestrator → Delegation Plan
-```
+## External Integrations
 
-## Error Handling
+- **Discourse Forums**: Uses `discourse_api` gem for Hugging Face and PyTorch forums
+- **GitHub**: Uses `octokit` gem for GitHub Issues API
+- **Reddit**: Uses `redd` gem for Reddit API access
+- **RSS Feeds**: Uses `feedjira` gem for Hacker News and other RSS sources
 
-Automatic escalation chain:
-1. Specialist agent attempts fix
-2. Escalate to `error-debugger`
-3. Escalate to `project-orchestrator`
-4. Replan and reassign
+## Security Considerations
 
-## Planning Protocol
-
-**MANDATORY: All complex tasks must begin with proper planning**
-
-1. **Planning Requirement**: Any task involving multiple steps, agents, or phases MUST start with project-orchestrator in Planning Mode
-2. **Plan Storage**: All plans MUST be saved to `@plans/[feature-name]/README.md` before execution
-3. **Todo Tracking**: Use TodoWrite tool to create actionable, trackable task lists
-4. **Execution Flow**: 
-   - User request → project-orchestrator analyzes complexity
-   - Complex task → Planning Mode creates plan
-   - Plan saved to @plans/ directory
-   - TodoWrite creates task list
-   - Execution Mode runs plan
-   - Progress tracked via Task Master
-
-### Plan Structure Requirements
-
-Every plan must include:
-- Clear objectives and success criteria
-- Actionable todo list with agent assignments
-- Test-Driven Development (TDD) approach
-- Linting and code quality phases
-- Implementation phases with timelines
-- Risk assessment and mitigation
-- Automatic execution command
-
-### TDD and Code Quality Protocol
-
-1. **Test First**: All new features MUST start with failing tests
-2. **Implementation**: Code only to make tests pass
-3. **Linting**: Run appropriate linters after each implementation:
-   - Ruby: `ruby-rails-expert` (includes RuboCop)
-   - JavaScript: `javascript-package-expert` (includes ESLint)
-4. **Quality Gates**: No phase proceeds with failing tests or linting errors
-
-### Planning Workflow Example
-
-```bash
-# For any complex feature request:
-Task(description="Implement [feature]",
-     subagent_type="project-orchestrator",
-     prompt="[Detailed requirements] - Create plan and execute with automatic handoffs")
-
-# Or if plan already exists:
-Task(description="Execute [feature] plan",
-     subagent_type="project-orchestrator", 
-     prompt="Execute plan at plans/[feature-name]/README.md")
-```
-
-## Best Practices
-
-- Always start complex tasks with project-orchestrator (Planning Mode)
-- Let orchestrator handle multi-domain tasks
-- Linting is integrated with language experts (not separate agents)
-- Trust automatic handoffs
-- Check Task Master for progress
-- Agents complete work before handoff
-- Use structured completion reports
-- Document all plans in @plans/ directory
-
-## Important Instructions
-
-- Do what's asked; nothing more, nothing less
-- Never create files unless necessary
-- Always prefer editing existing files
-- No unsolicited documentation creation
-- ALWAYS plan before executing complex tasks
-
-For detailed agent capabilities, see individual agent files in `.claude/agents/`
+- API credentials are encrypted and stored securely
+- OAuth tokens managed per source in the profile screen
+- Environment variables used for LLM provider API keys

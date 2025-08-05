@@ -3,7 +3,7 @@ require "test_helper"
 class SourceTest < ActiveSupport::TestCase
   # Validation tests
   test "should be valid with valid attributes" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     assert source.valid?
   end
 
@@ -18,28 +18,28 @@ class SourceTest < ActiveSupport::TestCase
   end
 
   test "should require source_type" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.source_type = nil
     assert_not source.valid?
     assert_includes source.errors[:source_type], "can't be blank"
   end
 
   test "should require url" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.url = nil
     assert_not source.valid?
     assert_includes source.errors[:url], "can't be blank"
   end
 
   test "should require valid url format" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.url = "invalid-url"
     assert_not source.valid?
     assert_includes source.errors[:url], "is invalid"
   end
 
   test "should accept http and https urls" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     
     source.url = "http://unique-example-test.com"
     assert source.valid?
@@ -49,7 +49,7 @@ class SourceTest < ActiveSupport::TestCase
   end
 
   test "should require active to be boolean" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.active = nil
     assert_not source.valid?
     assert_includes source.errors[:active], "is not included in the list"
@@ -57,7 +57,7 @@ class SourceTest < ActiveSupport::TestCase
 
   # Enum tests
   test "should have valid source_type enum values" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     
     ['github', 'reddit', 'discourse', 'rss', 'github_trending'].each do |type|
       source.source_type = type
@@ -66,7 +66,7 @@ class SourceTest < ActiveSupport::TestCase
   end
 
   test "should reject invalid source_type" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     assert_raises(ArgumentError) do
       source.source_type = 'invalid_type'
     end
@@ -98,32 +98,32 @@ class SourceTest < ActiveSupport::TestCase
   end
 
   test "config_hash should return empty hash for blank config" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     assert_equal({}, source.config_hash)
   end
 
   test "config_hash should handle invalid JSON gracefully" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.config = "invalid json"
     assert_equal({}, source.config_hash)
   end
 
   test "config_hash should clean up malformed config with prefix" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.config = 'Config: {"keywords": ["test"], "limit": 25}'
     expected = {"keywords" => ["test"], "limit" => 25}
     assert_equal expected, source.config_hash
   end
 
   test "config_hash should handle config with extra whitespace and newlines" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.config = "Config: {\"keywords\": [\"test\"]}\r\n\r\n"
     expected = {"keywords" => ["test"]}
     assert_equal expected, source.config_hash
   end
 
   test "config_hash= should set JSON config" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     new_config = {"keywords" => ["ruby", "rails"], "max_items" => 50}
     source.config_hash = new_config
     assert_equal new_config.to_json, source.config
@@ -132,7 +132,7 @@ class SourceTest < ActiveSupport::TestCase
 
   # Connection status methods
   test "connection_ok? should return true for ok status" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.status = 'ok'
     assert source.connection_ok?
   end
@@ -144,21 +144,21 @@ class SourceTest < ActiveSupport::TestCase
   end
 
   test "connection_ok? should return false for nil status" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.status = nil
     assert_not source.connection_ok?
   end
 
   # Edge cases
   test "should handle very long names" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     long_name = "a" * 1000
     source.name = long_name
     assert source.valid?
   end
 
   test "should handle complex config JSON" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     complex_config = {
       "keywords" => ["ruby", "rails"],
       "filters" => {
@@ -176,13 +176,13 @@ class SourceTest < ActiveSupport::TestCase
   end
 
   test "should handle nil last_fetched_at" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.last_fetched_at = nil
     assert source.valid?
   end
 
   test "should handle future last_fetched_at" do
-    source = sources(:one)
+    source = sources(:huggingface_forum)
     source.last_fetched_at = 1.hour.from_now
     assert source.valid?
   end

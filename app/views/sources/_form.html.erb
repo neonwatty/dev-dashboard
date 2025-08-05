@@ -1,109 +1,50 @@
-<%= form_with(model: source, local: true, class: "space-y-6", role: "form", "aria-labelledby": "source-form-heading", data: { controller: "screen-reader" }) do |form| %>
+<%= form_with(model: source, local: true, class: "space-y-6") do |form| %>
   <% if source.errors.any? %>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert" aria-describedby="form-errors">
-      <h4 class="font-bold" id="form-errors">Please fix the following errors:</h4>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      <h4 class="font-bold">Please fix the following errors:</h4>
       <ul class="list-disc list-inside">
         <% source.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
       </ul>
     </div>
-    <%= field_error_announcement("form", source.errors.full_messages) %>
   <% end %>
 
-  <fieldset>
-    <legend id="source-form-heading" class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-      <%= source.persisted? ? "Edit Source" : "Create New Source" %>
-    </legend>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" %>
-        <span class="text-red-500 ml-1" aria-hidden="true">*</span>
-        <%= form.text_field :name, 
-                           placeholder: "e.g., HuggingFace Forum",
-                           required: true,
-                           "aria-required": "true",
-                           "aria-describedby": (source.errors[:name].any? ? "name-error" : "name-help"),
-                           "aria-invalid": (source.errors[:name].any? ? "true" : "false"),
-                           class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                           autocomplete: "off",
-                           autocapitalize: "words" %>
-        <% if source.errors[:name].any? %>
-          <p id="name-error" class="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
-            <%= source.errors[:name].first %>
-          </p>
-        <% else %>
-          <p id="name-help" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            A descriptive name to identify this source
-          </p>
-        <% end %>
-      </div>
-
-      <div>
-        <%= form.label :source_type, class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" %>
-        <span class="text-red-500 ml-1" aria-hidden="true">*</span>
-        <div class="relative">
-          <%= form.select :source_type, 
-                         options_for_select([
-                           ['Discourse Forum', 'discourse'],
-                           ['GitHub Repository', 'github'],
-                           ['GitHub Trending', 'github_trending'],
-                           ['Reddit Subreddit', 'reddit'],
-                           ['RSS Feed', 'rss']
-                         ], source.source_type), 
-                         {},
-                         { class: "w-full px-4 py-3 pr-10 text-base appearance-none border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                           required: true,
-                           "aria-required": "true",
-                           "aria-describedby": (source.errors[:source_type].any? ? "source-type-error" : "source-type-help"),
-                           "aria-invalid": (source.errors[:source_type].any? ? "true" : "false"),
-                           data: { action: "change->source-form#toggleFields change->screen-reader#announceFormFieldChange" } } %>
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-        </div>
-        <% if source.errors[:source_type].any? %>
-          <p id="source-type-error" class="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
-            <%= source.errors[:source_type].first %>
-          </p>
-        <% else %>
-          <p id="source-type-help" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Select the type of source to configure
-          </p>
-        <% end %>
-      </div>
-    </div>
-  </fieldset>
-
-  <fieldset id="url-field">
-    <legend class="sr-only">Source URL Configuration</legend>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
-      <%= form.label :url, "Source URL", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" %>
-      <%= form.url_field :url, 
-                        placeholder: "https://discuss.huggingface.co",
-                        "aria-describedby": (source.errors[:url].any? ? "url-error" : "url-help"),
-                        "aria-invalid": (source.errors[:url].any? ? "true" : "false"),
-                        class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                        autocomplete: "url",
-                        inputmode: "url" %>
-      <% if source.errors[:url].any? %>
-        <p id="url-error" class="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
-          <%= source.errors[:url].first %>
-        </p>
-      <% else %>
-        <p id="url-help" class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          Base URL for the source (without /latest.json or other paths)
-        </p>
-      <% end %>
+      <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :name, 
+                         placeholder: "e.g., HuggingFace Forum",
+                         class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
     </div>
-  </fieldset>
+
+    <div>
+      <%= form.label :source_type, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.select :source_type, 
+                     options_for_select([
+                       ['Discourse Forum', 'discourse'],
+                       ['GitHub Repository', 'github'],
+                       ['GitHub Trending', 'github_trending'],
+                       ['Reddit Subreddit', 'reddit'],
+                       ['RSS Feed', 'rss']
+                     ], source.source_type), 
+                     {},
+                     { class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500",
+                       data: { action: "change->source-form#toggleFields" } } %>
+    </div>
+  </div>
+
+  <div id="url-field">
+    <%= form.label :url, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.url_field :url, 
+                      placeholder: "https://discuss.huggingface.co",
+                      class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+    <p class="text-sm text-gray-500 mt-1">Base URL for the source (without /latest.json or other paths)</p>
+  </div>
 
   <!-- Discourse-specific fields -->
-  <fieldset id="discourse-fields" class="space-y-4 <%= source.source_type == 'discourse' ? '' : 'hidden' %>">
-    <legend class="text-lg font-semibold text-gray-900 dark:text-gray-100">Discourse Configuration</legend>
+  <div id="discourse-fields" class="space-y-4 <%= source.source_type == 'discourse' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">Discourse Configuration</h3>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
@@ -111,8 +52,7 @@
         <%= text_field_tag "discourse_api_key", 
                           source.config_hash['api_key'],
                           placeholder: "Leave blank for public forums",
-                          class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                          autocomplete: "off" %>
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
         <p class="text-sm text-gray-500 mt-1">Required only for private forums or to avoid rate limits</p>
       </div>
 
@@ -121,8 +61,7 @@
         <%= text_field_tag "discourse_api_username", 
                           source.config_hash['api_username'] || 'system',
                           placeholder: "system",
-                          class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                          autocomplete: "username" %>
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>
     </div>
 
@@ -149,23 +88,21 @@
       <%= text_field_tag "discourse_priority_tags", 
                         source.config_hash['priority_tags']&.join(', '),
                         placeholder: "bug, help-wanted, urgent",
-                        class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                        autocomplete: "off" %>
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       <p class="text-sm text-gray-500 mt-1">Posts with these tags will get higher priority scores</p>
     </div>
-  </fieldset>
+  </div>
 
   <!-- GitHub-specific fields -->
-  <fieldset id="github-fields" class="space-y-4 <%= source.source_type == 'github' ? '' : 'hidden' %>">
-    <legend class="text-lg font-semibold text-gray-900 dark:text-gray-100">GitHub Configuration</legend>
+  <div id="github-fields" class="space-y-4 <%= source.source_type == 'github' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">GitHub Configuration</h3>
     
     <div>
       <%= label_tag "github_token", "Personal Access Token", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= password_field_tag "github_token", 
+      <%= text_field_tag "github_token", 
                         source.config_hash['token'],
                         placeholder: "ghp_...",
-                        class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                        autocomplete: "off" %>
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       <p class="text-sm text-gray-500 mt-1">Required for private repos and higher rate limits</p>
     </div>
 
@@ -174,33 +111,25 @@
       <%= text_field_tag "github_labels", 
                         source.config_hash['labels']&.join(', '),
                         placeholder: "bug, enhancement, help-wanted",
-                        class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                        autocomplete: "off" %>
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
     </div>
-  </fieldset>
+  </div>
 
   <!-- Reddit-specific fields -->
-  <fieldset id="reddit-fields" class="space-y-4 <%= source.source_type == 'reddit' ? '' : 'hidden' %>">
-    <legend class="text-lg font-semibold text-gray-900 dark:text-gray-100">Reddit Configuration</legend>
+  <div id="reddit-fields" class="space-y-4 <%= source.source_type == 'reddit' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">Reddit Configuration</h3>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <%= label_tag "reddit_sort", "Sort By", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <div class="relative">
-          <%= select_tag "reddit_sort", 
-                        options_for_select([
-                          ['Hot', 'hot'],
-                          ['New', 'new'],
-                          ['Rising', 'rising'],
-                          ['Top', 'top']
-                        ], source.config_hash['sort'] || 'hot'),
-                        class: "w-full px-4 py-3 pr-10 text-base appearance-none border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target" %>
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-        </div>
+        <%= select_tag "reddit_sort", 
+                      options_for_select([
+                        ['Hot', 'hot'],
+                        ['New', 'new'],
+                        ['Rising', 'rising'],
+                        ['Top', 'top']
+                      ], source.config_hash['sort'] || 'hot'),
+                      class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>
 
       <div>
@@ -209,8 +138,7 @@
                            source.config_hash['limit'] || 25,
                            min: 1,
                            max: 100,
-                           class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                           inputmode: "numeric" %>
+                           class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>
     </div>
 
@@ -219,14 +147,13 @@
       <%= text_field_tag "reddit_keywords", 
                         source.config_hash['keywords']&.join(', '),
                         placeholder: "python, machine learning, AI",
-                        class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                        autocomplete: "off" %>
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
     </div>
-  </fieldset>
+  </div>
 
   <!-- RSS-specific fields -->
-  <fieldset id="rss-fields" class="space-y-4 <%= source.source_type == 'rss' ? '' : 'hidden' %>">
-    <legend class="text-lg font-semibold text-gray-900 dark:text-gray-100">RSS Configuration</legend>
+  <div id="rss-fields" class="space-y-4 <%= source.source_type == 'rss' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">RSS Configuration</h3>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
@@ -234,8 +161,7 @@
         <%= text_field_tag "rss_keywords", 
                           source.config_hash['keywords']&.join(', '),
                           placeholder: "ruby, rails, programming",
-                          class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                          autocomplete: "off" %>
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>
 
       <div>
@@ -244,43 +170,34 @@
                            source.config_hash['max_items'] || 20,
                            min: 1,
                            max: 100,
-                           class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                           inputmode: "numeric" %>
+                           class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>
     </div>
-  </fieldset>
+  </div>
 
   <!-- GitHub Trending-specific fields -->
-  <fieldset id="github_trending-fields" class="space-y-4 <%= source.source_type == 'github_trending' ? '' : 'hidden' %>">
-    <legend class="text-lg font-semibold text-gray-900 dark:text-gray-100">GitHub Trending Configuration</legend>
+  <div id="github_trending-fields" class="space-y-4 <%= source.source_type == 'github_trending' ? '' : 'hidden' %>">
+    <h3 class="text-lg font-semibold text-gray-900">GitHub Trending Configuration</h3>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <%= label_tag "github_trending_token", "GitHub Token (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= password_field_tag "github_trending_token", 
+        <%= text_field_tag "github_trending_token", 
                           source.config_hash['token'],
                           placeholder: "ghp_...",
-                          class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                          autocomplete: "off" %>
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
         <p class="text-sm text-gray-500 mt-1">Improves rate limits and access to more data</p>
       </div>
 
       <div>
         <%= label_tag "github_trending_since", "Time Period", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <div class="relative">
-          <%= select_tag "github_trending_since", 
-                        options_for_select([
-                          ['Daily', 'daily'],
-                          ['Weekly', 'weekly'],
-                          ['Monthly', 'monthly']
-                        ], source.config_hash['since'] || 'daily'),
-                        class: "w-full px-4 py-3 pr-10 text-base appearance-none border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target" %>
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-        </div>
+        <%= select_tag "github_trending_since", 
+                      options_for_select([
+                        ['Daily', 'daily'],
+                        ['Weekly', 'weekly'],
+                        ['Monthly', 'monthly']
+                      ], source.config_hash['since'] || 'daily'),
+                      class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
       </div>
     </div>
 
@@ -290,8 +207,7 @@
         <%= text_field_tag "github_trending_language", 
                           source.config_hash['language'],
                           placeholder: "JavaScript, Python, Ruby...",
-                          class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                          autocomplete: "off" %>
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
         <p class="text-sm text-gray-500 mt-1">Leave blank for all languages</p>
       </div>
 
@@ -300,8 +216,7 @@
         <%= text_field_tag "github_trending_preferred_languages", 
                           source.config_hash['preferred_languages']&.join(', '),
                           placeholder: "Python, JavaScript, Go",
-                          class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mobile-input touch-target",
-                          autocomplete: "off" %>
+                          class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" %>
         <p class="text-sm text-gray-500 mt-1">Repositories in these languages get higher priority scores</p>
       </div>
     </div>
@@ -322,7 +237,7 @@
         ⚠️ Scraping may be against GitHub's Terms of Service. Use responsibly.
       </p>
     </div>
-  </fieldset>
+  </div>
 
   <!-- Raw JSON config (hidden by default) -->
   <div class="mt-6">
@@ -338,43 +253,29 @@
       <%= form.label :config, "Raw Configuration (JSON)", class: "block text-sm font-medium text-gray-700 mb-2" %>
       <%= form.text_area :config, 
                         rows: 4,
-                        class: "w-full px-4 py-3 text-base border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono mobile-input" %>
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" %>
     </div>
   </div>
 
-  <fieldset class="space-y-3">
-    <legend class="text-base font-medium text-gray-900 dark:text-gray-100 mb-2">Source Settings</legend>
-    
-    <div class="flex items-start space-x-3">
-      <%= form.check_box :active, 
-                        class: "mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
-                        "aria-describedby": "active-help" %>
-      <div class="flex-1">
-        <%= form.label :active, "Active", class: "text-sm font-medium text-gray-700 dark:text-gray-300" %>
-        <p id="active-help" class="text-sm text-gray-500 dark:text-gray-400">
-          Active sources are included in scheduled fetches
-        </p>
-      </div>
+  <div class="space-y-3">
+    <div class="flex items-center">
+      <%= form.check_box :active, class: "mr-2" %>
+      <%= form.label :active, "Active", class: "text-sm font-medium text-gray-700" %>
+      <p class="text-sm text-gray-500 ml-2">Active sources are included in scheduled fetches</p>
     </div>
     
-    <div class="flex items-start space-x-3">
-      <%= form.check_box :auto_fetch_enabled, 
-                        class: "mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
-                        "aria-describedby": "auto-fetch-help" %>
-      <div class="flex-1">
-        <%= form.label :auto_fetch_enabled, "Auto-fetch latest posts", class: "text-sm font-medium text-gray-700 dark:text-gray-300" %>
-        <p id="auto-fetch-help" class="text-sm text-gray-500 dark:text-gray-400">
-          Automatically fetch new posts from this source during scheduled runs
-        </p>
-      </div>
+    <div class="flex items-center">
+      <%= form.check_box :auto_fetch_enabled, class: "mr-2" %>
+      <%= form.label :auto_fetch_enabled, "Auto-fetch latest posts", class: "text-sm font-medium text-gray-700" %>
+      <p class="text-sm text-gray-500 ml-2">Automatically fetch new posts from this source during scheduled runs</p>
     </div>
-  </fieldset>
+  </div>
 
-  <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4">
+  <div class="flex justify-end space-x-4">
     <%= link_to "Cancel", source.persisted? ? source : sources_path, 
-               class: "bg-gray-500 hover:bg-gray-700 dark:bg-gray-600 dark:hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-md text-center touch-target order-2 sm:order-1" %>
+               class: "bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded" %>
     <%= form.submit source.persisted? ? "Update Source" : "Create Source", 
-                   class: "bg-blue-500 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-md touch-target order-1 sm:order-2" %>
+                   class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
   </div>
 <% end %>
 

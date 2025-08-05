@@ -1,6 +1,6 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
+huggingface_forum:
   name: HuggingFace Forum
   source_type: discourse
   url: https://discuss.huggingface.co
@@ -78,15 +78,6 @@ github_trending_weekly:
   config: '{"since": "weekly", "language": "Python", "token": "test_token_123"}'
   active: true
   auto_fetch_enabled: true
-  last_fetched_at: <%= 1.hour.ago %>
-  status: ok
-
-huggingface_forum:
-  name: HuggingFace Forum Alternative
-  source_type: discourse
-  url: https://discuss.huggingface.co/alternative
-  config: '{}'
-  active: true
   last_fetched_at: <%= 1.hour.ago %>
   status: ok
 

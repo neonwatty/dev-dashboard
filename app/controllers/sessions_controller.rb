@@ -3,10 +3,6 @@ class SessionsController < ApplicationController
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_url, alert: "Try again later." }
 
   def new
-    # Move auth required info from session to flash for display
-    if session[:auth_required_info]
-      flash.now[:auth_required] = session.delete(:auth_required_info)
-    end
   end
 
   def create

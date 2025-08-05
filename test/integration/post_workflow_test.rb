@@ -2,8 +2,8 @@ require "test_helper"
 
 class PostWorkflowTest < ActionDispatch::IntegrationTest
   setup do
-    @source = sources(:one)
-    @post = posts(:one)
+    @source = sources(:huggingface_forum)
+    @post = posts(:huggingface_post)
     @user = users(:one)
     sign_in_as(@user)
   end
@@ -12,14 +12,14 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
     # Visit posts index
     get posts_path
     assert_response :success
-    assert_select "h1", "Posts"
+    assert_select "h1", "Developer Dashboard"
     
     # Verify post is displayed
     assert_select "h3", @post.title
     assert_select "span", text: "Unread"
     
     # Filter by source
-    get posts_path(source: "one")
+    get posts_path(source: "huggingface")
     assert_response :success
     assert_select "h3", @post.title
     
@@ -118,7 +118,7 @@ class PostWorkflowTest < ActionDispatch::IntegrationTest
     assert_select "a", @source.name
     
     # Click back to posts with specific source filter
-    get posts_path(source: "one")
+    get posts_path(source: "huggingface")
     assert_response :success
     
     # Should see posts from that source

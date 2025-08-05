@@ -2,7 +2,7 @@ require "test_helper"
 
 class SourceAutoFetchTest < ActiveSupport::TestCase
   def setup
-    @source = sources(:one)
+    @source = sources(:huggingface_forum)
   end
 
   test "new sources have auto_fetch_enabled true by default" do

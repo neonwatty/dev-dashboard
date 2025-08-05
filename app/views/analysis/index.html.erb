@@ -1,4 +1,4 @@
-<div class="responsive-container mobile-padding">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
   <!-- Page Header -->
   <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
@@ -6,8 +6,8 @@
   </div>
 
   <!-- Stats Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center">
         <div class="flex-shrink-0">
           <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +21,7 @@
       </div>
     </div>
     
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center">
         <div class="flex-shrink-0">
           <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@
       </div>
     </div>
     
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center">
         <div class="flex-shrink-0">
           <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,7 +49,7 @@
       </div>
     </div>
     
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <div class="flex items-center">
         <div class="flex-shrink-0">
           <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,20 +65,20 @@
   </div>
 
   <!-- Key Metrics Row -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-2">Response Rate</h3>
       <p class="text-3xl font-bold text-green-600"><%= @response_rate %>%</p>
       <p class="text-sm text-gray-500 mt-1">of non-ignored posts responded to</p>
     </div>
     
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-2">Recent Activity</h3>
       <p class="text-3xl font-bold text-blue-600"><%= @recent_posts %></p>
       <p class="text-sm text-gray-500 mt-1">posts in the last 7 days</p>
     </div>
     
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-2">Daily Average</h3>
       <p class="text-3xl font-bold text-purple-600"><%= @avg_posts_per_day %></p>
       <p class="text-sm text-gray-500 mt-1">posts per day (30-day average)</p>
@@ -86,8 +86,8 @@
   </div>
 
   <!-- Posts by Source -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-4">Posts by Source</h3>
       <% if @posts_by_source.any? %>
         <div class="space-y-3">
@@ -111,7 +111,7 @@
     </div>
 
     <!-- Posts by Status -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
+    <div class="bg-white rounded-lg shadow-md p-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-4">Posts by Status</h3>
       <% if @posts_by_status.any? %>
         <div class="space-y-3">
